@@ -107,7 +107,7 @@ export async function requireSession(role?: UserRole) {
   }
 
   if (role && user.role !== role) {
-    redirect(user.role === "manager" ? "/manager" : "/admin");
+    redirect(user.role === "master" ? "/master" : user.role === "manager" ? "/manager" : "/admin");
   }
 
   return {

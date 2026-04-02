@@ -40,6 +40,8 @@ export const managerInviteCreateSchema = z.object({
   email: z.string().trim().toLowerCase().email().optional().or(z.literal("")),
 });
 
+export const masterInviteCreateSchema = managerInviteCreateSchema;
+
 export const managerRegisterSchema = z.object({
   code: z.string().trim().min(6),
   city: z.string().trim().min(2),

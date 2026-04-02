@@ -25,9 +25,6 @@ export default async function HomePage() {
             <Link href="/login" className="primary-button">
               Войти в систему
             </Link>
-            <a href="#features" className="secondary-button">
-              Войти в систему
-            </a>
           </div>
         </div>
 

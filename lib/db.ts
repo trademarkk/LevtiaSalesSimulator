@@ -414,3 +414,33 @@ export async function setSetting(key: string, value: string, city: string) {
   );
   return getSetting(key, city);
 }
+
+export async function listManagerInvites() {
+  const result = await getPool().query(`SELECT id, code, city, email, is_used, created_at, used_at FROM manager_invites ORDER BY created_at DESC, id DESC`);
+  return result.rows.map((row) => ({
+    id: Number(row.id),
+    code: String(row.code),
+    city: String(row.city),
+    email: row.email ? String(row.email) : null,
+    isUsed: Boolean(row.is_used),
+    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+    usedAt: row.used_at ? (row.used_at instanceof Date ? row.used_at.toISOString() : String(row.used_at)) : null,
+  }));
+}
+
+export async function listManagerAccounts() {
+  const result = await getPool().query(`SELECT id, name, email, city, status, created_at FROM users WHERE role = 'manager' ORDER BY created_at DESC, id DESC`);
+  return result.rows.map((row) => ({
+    id: Number(row.id),
+    name: String(row.name),
+    email: String(row.email),
+    city: String(row.city ?? row.name ?? ''),
+    status: String(row.status ?? 'active') as 'active' | 'disabled',
+    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+  }));
+}
+
+export async function setManagerStatus(id: number, status: 'active' | 'disabled') {
+  await getPool().query("UPDATE users SET status = $1 WHERE id = $2 AND role = 'manager'", [status, id]);
+  return listManagerAccounts();
+}

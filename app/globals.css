@@ -664,6 +664,51 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.master-layout {
+  gap: 24px;
+}
+
+.master-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.1fr);
+  gap: 20px;
+}
+
+.master-card {
+  background: linear-gradient(180deg, rgba(255, 250, 246, 0.94), rgba(247, 235, 229, 0.9));
+}
+
+.master-card--invite {
+  align-content: start;
+}
+
+.master-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.master-filters {
+  grid-template-columns: 2fr minmax(220px, 0.8fr);
+  margin-bottom: 20px;
+}
+
+.master-stats-grid {
+  margin-bottom: 0;
+}
+
+.master-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.master-list--managers {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.master-record-card {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 32px rgba(72, 34, 33, 0.08);
+}
+
 .manager-filters {
   display: grid;
   grid-template-columns: 2fr repeat(3, minmax(0, 1fr));
@@ -834,7 +879,10 @@ textarea {
   .feature-grid,
   .stats-grid,
   .objection-list,
-  .history-grid {
+  .history-grid,
+  .master-grid,
+  .master-list,
+  .master-list--managers {
     grid-template-columns: 1fr;
   }
 

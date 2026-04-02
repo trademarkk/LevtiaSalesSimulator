@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "manager";
+export type UserRole = "admin" | "manager" | "master";
 
 export type ScenarioDifficulty = "easy" | "medium" | "hard";
 export type ChatPhase = "conversation" | "evaluation";

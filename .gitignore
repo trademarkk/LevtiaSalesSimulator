@@ -7,3 +7,9 @@ data/*.sqlite
 data/*.sqlite-shm
 data/*.sqlite-wal
 npm-debug.log*
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+tsconfig.tsbuildinfo
