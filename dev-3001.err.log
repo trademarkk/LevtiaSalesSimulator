@@ -1,8 +1,0 @@
-⨯ Another next dev server is already running.
-
-- Local:        http://localhost:3000
-- PID:          19984
-- Dir:          C:\Users\trade\OneDrive\Desktop\123
-- Log:          .next-levita\dev\logs\next-development.log
-
-Run taskkill /PID 19984 /F to stop it.
