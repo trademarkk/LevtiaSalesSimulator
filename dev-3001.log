@@ -1,0 +1,10 @@
+
+> levita-sales-simulator@0.1.0 dev
+> next dev --webpack --port 3001
+
+▲ Next.js 16.2.1 (webpack)
+- Local:         http://localhost:3001
+- Network:       http://172.16.0.1:3001
+- Environments: .env
+✓ Ready in 495ms
+[?25h

@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  manager
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum TrainerMode {
+  openai
+  deepseek
+  openrouter
+  demo
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  passwordHash String       @map("password_hash")
+  role         UserRole
+  name         String
+  city         String?
+  status       UserStatus   @default(active)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+
+  trainingSessions TrainingSession[] @relation("AdminTrainingSessions")
+
+  @@map("users")
+}
+
+model ManagerInvite {
+  id        Int       @id @default(autoincrement())
+  code      String    @unique
+  city      String
+  email     String?
+  isUsed    Boolean   @default(false) @map("is_used")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamp(6)
+
+  @@map("manager_invites")
+}
+
+model Objection {
+  id            Int       @id @default(autoincrement())
+  title         String
+  objectionText String    @map("objection_text")
+  coachHint     String    @default("") @map("coach_hint")
+  stage         String    @default("general")
+  difficulty    Difficulty @default(medium)
+  isActive      Boolean   @default(true) @map("is_active")
+  isRequired    Boolean   @default(false) @map("is_required")
+  city          String?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@map("objections")
+}
+
+model Setting {
+  key       String
+  city      String
+  value     String
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@id([key, city])
+  @@map("settings")
+}
+
+model TrainingSession {
+  id                 Int        @id @default(autoincrement())
+  adminDisplayName   String     @map("admin_display_name")
+  adminUserId        Int?       @map("admin_user_id")
+  city               String?
+  scenarioDifficulty Difficulty @map("scenario_difficulty")
+  stepCount          Int        @map("step_count")
+  trainerMode        TrainerMode @map("trainer_mode")
+  evaluationText     String     @map("evaluation_text")
+  score              Int?
+  transcriptJson     String     @map("transcript_json")
+  startedAt          String     @map("started_at")
+  completedAt        String     @map("completed_at")
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+
+  adminUser User? @relation("AdminTrainingSessions", fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@map("training_sessions")
+}

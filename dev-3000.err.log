@@ -1,0 +1,504 @@
+(node:28208) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:08:20 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e38ec39998314bd-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:10:42 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e38efb11fc06711-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Provider returned error
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:17:40 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e38f9e6c99cbcc9-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Provider returned error',
+    code: 429,
+    metadata: {
+      raw: 'mistralai/mistral-small-3.1-24b-instruct:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations',
+      provider_name: 'Venice',
+      is_byok: false
+    }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:18:25 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e38fafa2efbfeac-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-min. 
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:18:55 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '20',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774725540000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e38fbb96b7770c7-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-min. ',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:503:17)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:19:22 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e38fc643f6d3129-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+(node:25664) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12700) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:24:29 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e3903dffbee9ff9-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Provider returned error
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:25:11 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e3904eb191891f2-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Provider returned error',
+    code: 429,
+    metadata: {
+      raw: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations',
+      provider_name: 'Venice',
+      is_byok: false
+    }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Provider returned error
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:25:50 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e3905e10b0e9f62-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Provider returned error',
+    code: 429,
+    metadata: {
+      raw: 'qwen/qwen3-next-80b-a3b-instruct:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations',
+      provider_name: 'Venice',
+      is_byok: false
+    }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:27:05 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e3907b1ff83db48-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:28:56 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e390a6a7a2b2d8e-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 429 Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:567:15)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 429,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:34:20 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'x-ratelimit-limit': '50',
+    'x-ratelimit-remaining': '0',
+    'x-ratelimit-reset': '1774742400000',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e391250deec5639-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day',
+    code: 429,
+    metadata: { headers: [Object], provider_name: null }
+  },
+  code: 429,
+  param: undefined,
+  type: undefined
+}
+[trainer] openrouter fallback engaged before stream start Error: 402 Provider returned error
+    at async createProviderStream (lib\trainer-engine.ts:414:14)
+    at async streamTrainerReply (lib\trainer-engine.ts:503:17)
+    at async POST (app\api\chat-stream\route.ts:100:20)
+  412 |
+  413 |   try {
+> 414 |     stream = await client.chat.completions.create({
+      |              ^
+  415 |     model: isOpenRouter
+  416 |       ? process.env.OPENROUTER_MODEL || "openrouter/free"
+  417 |       : process.env.DEEPSEEK_MODEL || "deepseek-chat", {
+  status: 402,
+  headers: Headers {
+    date: 'Sat, 28 Mar 2026 19:34:28 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+    'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")',
+    'referrer-policy': 'no-referrer, strict-origin-when-cross-origin',
+    'x-content-type-options': 'nosniff',
+    server: 'cloudflare',
+    'cf-ray': '9e39127aba62fff1-AMS'
+  },
+  requestID: null,
+  error: {
+    message: 'Provider returned error',
+    code: 402,
+    metadata: {
+      raw: '{"error":"API key USD spend limit exceeded. Your account may still have USD balance, but this API key has reached its configured USD spending limit."}',
+      provider_name: 'Venice',
+      is_byok: false
+    }
+  },
+  code: 402,
+  param: undefined,
+  type: undefined
+}
+(node:25964) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+(node:18600) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16648) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18532) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28904) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
