@@ -28,6 +28,12 @@ html {
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -53,6 +59,15 @@ select {
 
 button {
   cursor: pointer;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+  height: auto;
 }
 
 main,
@@ -321,6 +336,7 @@ input,
 textarea,
 select {
   width: 100%;
+  min-width: 0;
   border: 1px solid rgba(82, 48, 49, 0.12);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.72);
@@ -444,6 +460,10 @@ textarea {
   margin-bottom: 26px;
 }
 
+.workspace__header > * {
+  min-width: 0;
+}
+
 .workspace__header h1 {
   font-size: clamp(2.3rem, 4vw, 4rem);
   margin-bottom: 10px;
@@ -453,6 +473,7 @@ textarea {
   display: grid;
   gap: 8px;
   justify-items: flex-end;
+  min-width: 0;
 }
 
 .workspace__nav {
@@ -462,6 +483,7 @@ textarea {
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 .workspace__nav-link {
@@ -497,6 +519,7 @@ textarea {
   z-index: 1;
   display: grid;
   gap: 22px;
+  min-width: 0;
 }
 
 .trainer-layout {
@@ -512,6 +535,7 @@ textarea {
 .trainer-panel,
 .manager-card {
   padding: 28px;
+  min-width: 0;
 }
 
 .trainer-panel--accent {
@@ -536,6 +560,7 @@ textarea {
   min-height: 55vh;
   max-height: 62vh;
   overflow: auto;
+  overflow-x: hidden;
   padding: 12px 8px 12px 0;
 }
 
@@ -551,7 +576,7 @@ textarea {
 }
 
 .message-bubble {
-  max-width: 78%;
+  max-width: min(78%, 100%);
   display: grid;
   gap: 8px;
   padding: 18px 20px;
@@ -559,6 +584,7 @@ textarea {
   border: 1px solid var(--line);
   box-shadow: 0 12px 24px rgba(72, 34, 33, 0.07);
   margin-block: 6px;
+  min-width: 0;
 }
 
 .message-bubble span {
@@ -655,6 +681,7 @@ textarea {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: anywhere;
   font-family: "Manrope", "Segoe UI", sans-serif;
   line-height: 1.7;
   color: var(--text);
@@ -743,6 +770,11 @@ textarea {
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
+  min-width: 0;
+}
+
+.manager-card__header > * {
+  min-width: 0;
 }
 
 .inline-fields {
@@ -836,6 +868,7 @@ textarea {
   padding: 22px;
   background: rgba(255, 255, 255, 0.66);
   border: 1px solid var(--line);
+  min-width: 0;
 }
 
 .objection-card p,
@@ -872,7 +905,8 @@ textarea {
   .hero,
   .login-hero,
   .trainer-layout,
-  .manager-columns {
+  .manager-columns,
+  .master-grid {
     grid-template-columns: 1fr;
   }
 
@@ -880,7 +914,6 @@ textarea {
   .stats-grid,
   .objection-list,
   .history-grid,
-  .master-grid,
   .master-list,
   .master-list--managers {
     grid-template-columns: 1fr;
@@ -890,8 +923,18 @@ textarea {
     flex-direction: column;
   }
 
+  .workspace__controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .workspace__identity {
     justify-items: flex-start;
+  }
+
+  .manager-filters,
+  .master-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -907,24 +950,118 @@ textarea {
   .login-card,
   .login-hero__copy,
   .trainer-panel,
-  .manager-card {
+  .manager-card,
+  .stat-card,
+  .objection-card,
+  .history-card {
     padding: 22px;
     border-radius: 24px;
+  }
+
+  .workspace__nav {
+    gap: 10px;
+  }
+
+  .workspace__nav-link,
+  .primary-button,
+  .secondary-button,
+  .auth-tab {
+    width: 100%;
+  }
+
+  .workspace__controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .demo-credentials,
   .inline-fields,
   .trainer-config__grid,
-  .manager-filters {
+  .manager-filters,
+  .master-filters,
+  .auth-tabs {
     grid-template-columns: 1fr;
   }
 
-  .voice-toolbar {
+  .voice-toolbar,
+  .objection-card__footer--stack,
+  .manager-card__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-toolbar,
+  .objection-card__actions,
+  .chat-form__actions {
     flex-direction: column;
     align-items: stretch;
   }
 
   .message-bubble {
-    max-width: 92%;
+    max-width: 100%;
+    padding: 16px 18px;
+  }
+
+  .chat-window {
+    min-height: 48vh;
+    max-height: none;
+    padding-right: 0;
+  }
+
+  .trainer-panel--chat {
+    min-height: auto;
+  }
+
+  .workspace__backdrop {
+    width: 280px;
+    height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-page,
+  .login-page,
+  .workspace {
+    padding: 14px;
+  }
+
+  .hero__content,
+  .hero__card,
+  .login-card,
+  .login-hero__copy,
+  .trainer-panel,
+  .manager-card,
+  .stat-card,
+  .objection-card,
+  .history-card,
+  .note-card,
+  .trainer-result {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .pill {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .feature-card h3,
+  .objection-card h3,
+  .note-card h3,
+  .history-card h2 {
+    font-size: 1.5rem;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 12px 14px;
+    border-radius: 16px;
   }
 }
