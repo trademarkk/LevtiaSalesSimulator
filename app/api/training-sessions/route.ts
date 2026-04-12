@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
 import { getSessionFromCookie } from "@/lib/auth";
-import { createTrainingSession, deleteTrainingSessionsById } from "@/lib/db";
+import { createTrainingSession, deleteTrainingSessionsById, getUserById } from "@/lib/db";
 import { getZodErrorMessage, trainingSessionCreateSchema, trainingSessionDeleteSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -19,12 +19,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Только администратор может сохранять тренировку." }, { status: 403 });
   }
 
+  const user = await getUserById(session.userId);
+  const ownerEmail = user?.managerEmail || session.managerEmail || session.email;
+
   try {
     const body = trainingSessionCreateSchema.parse(await request.json());
     await createTrainingSession({
       adminDisplayName: body.adminDisplayName,
       adminUserId: session.userId,
       city: session.city || session.name,
+      ownerEmail,
       scenario: body.scenario,
       trainerMode: body.trainerMode,
       evaluationText: body.evaluationText,
@@ -46,7 +50,7 @@ export async function DELETE(request: Request) {
 
   try {
     const body = trainingSessionDeleteSchema.parse(await request.json());
-    const deletedCount = await deleteTrainingSessionsById([...new Set(body.ids)], session.name);
+    const deletedCount = await deleteTrainingSessionsById([...new Set(body.ids)], session.email);
     return NextResponse.json({ ok: true, deletedCount });
   } catch (error) {
     const message = error instanceof ZodError ? getZodErrorMessage(error) : error instanceof Error ? error.message : "Нужно передать хотя бы один id тренировки.";

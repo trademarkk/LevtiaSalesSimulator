@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Только руководитель может видеть библиотеку." }, { status: 403 });
   }
 
-  return NextResponse.json({ objections: await listObjections(session.name) });
+  return NextResponse.json({ objections: await listObjections(session.email) });
 }
 
 export async function POST(request: Request) {
@@ -43,7 +43,8 @@ export async function POST(request: Request) {
       difficulty: body.difficulty,
       isActive: body.isActive,
       isRequired: body.isRequired,
-      city: session.name,
+      city: session.city || session.name,
+      ownerEmail: session.email,
     });
 
     return NextResponse.json({ objections });

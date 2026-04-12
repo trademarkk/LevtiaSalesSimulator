@@ -116,5 +116,6 @@ export async function requireSession(role?: UserRole) {
     name: user.name,
     city: user.city,
     email: user.email,
+    managerEmail: user.managerEmail ?? null,
   } satisfies SessionPayload;
 }

@@ -61,11 +61,12 @@ export async function POST(request: Request) {
 
   try {
     const body = chatRequestSchema.parse(await request.json());
+    const phase = body.phase || "conversation";
 
     const result = await streamTrainerReply({
       messages: body.messages,
       scenario: body.scenario,
-      phase: body.phase || "conversation",
+      phase,
       turnNumber: body.turnNumber,
     });
 

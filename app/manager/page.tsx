@@ -1,14 +1,14 @@
 import { AppShell } from "@/components/app-shell";
 import { ManagerDashboard } from "@/components/manager-dashboard";
 import { requireSession } from "@/lib/auth";
-import { ensureCityData, getSetting, listObjections } from "@/lib/db";
+import { ensureManagerData, getSetting, listObjections } from "@/lib/db";
 
 export default async function ManagerPage() {
   const session = await requireSession("manager");
   const city = session.city || session.name;
-  await ensureCityData(city);
-  const objections = await listObjections(city);
-  const trainerPrompt = await getSetting("trainer_prompt", city);
+  await ensureManagerData({ city, ownerEmail: session.email });
+  const objections = await listObjections(session.email);
+  const trainerPrompt = await getSetting("trainer_prompt", session.email);
 
   return (
     <AppShell

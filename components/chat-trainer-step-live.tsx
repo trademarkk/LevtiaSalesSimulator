@@ -19,11 +19,13 @@ type SpeechRecognitionCtor = new () => {
   lang: string;
   interimResults: boolean;
   continuous: boolean;
+  maxAlternatives?: number;
   start: () => void;
   stop: () => void;
+  abort?: () => void;
   onstart: null | (() => void);
   onend: null | (() => void);
-  onerror: null | ((event: { error: string }) => void);
+  onerror: null | ((event: { error: string; message?: string }) => void);
   onresult: null | ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void);
 };
 
@@ -73,6 +75,26 @@ function countAdminReplies(messages: ChatMessage[]) {
   return messages.filter((message) => message.role === "user").length;
 }
 
+function getSpeechRecognitionErrorMessage(error?: string) {
+  switch (error) {
+    case "not-allowed":
+    case "service-not-allowed":
+      return "Браузер не получил доступ к микрофону. Проверь разрешение на микрофон для Safari и открой сайт по HTTPS.";
+    case "audio-capture":
+      return "Не удалось получить звук с микрофона. Проверь, что микрофон не занят другим приложением.";
+    case "network":
+      return "Ошибка распознавания речи. На iPhone это часто связано с Safari. Попробуй еще раз, проверь интернет или перезагрузи страницу.";
+    case "no-speech":
+      return "Речь не распознана. Попробуй говорить чуть дольше и громче после старта записи.";
+    case "aborted":
+      return "Запись была остановлена до завершения распознавания.";
+    case "language-not-supported":
+      return "Браузер не поддерживает распознавание для выбранного языка.";
+    default:
+      return "Не удалось распознать голос. Попробуйте еще раз.";
+  }
+}
+
 export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerStepLiveProps) {
   const [difficulty, setDifficulty] = useState<ScenarioDifficulty>("medium");
   const [stepCount, setStepCount] = useState(20);
@@ -109,7 +131,6 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
 
   function stopRecognition() {
     recognitionRef.current?.stop?.();
-    recognitionRef.current = null;
     setIsRecording(false);
   }
 
@@ -121,11 +142,20 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
       return;
     }
 
+    if (!window.isSecureContext) {
+      setError("Голосовой ввод работает только в защищенном контексте. Открой приложение по HTTPS.");
+      return;
+    }
+
+    recognitionRef.current?.abort?.();
+    recognitionRef.current = null;
     setError("");
+
     const recognition = new Recognition();
     recognition.lang = "ru-RU";
-    recognition.interimResults = true;
+    recognition.interimResults = false;
     recognition.continuous = false;
+    recognition.maxAlternatives = 1;
 
     recognition.onstart = () => setIsRecording(true);
     recognition.onend = () => {
@@ -135,20 +165,34 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
     recognition.onerror = (event) => {
       setIsRecording(false);
       recognitionRef.current = null;
-      if (event.error === "not-allowed") setError("Браузер не получил доступ к микрофону.");
-      else setError("Не удалось распознать голос. Попробуйте еще раз.");
+      setError(getSpeechRecognitionErrorMessage(event.error));
     };
     recognition.onresult = (event) => {
       let transcript = "";
       for (let i = 0; i < event.results.length; i += 1) {
         transcript += event.results[i][0]?.transcript || "";
       }
-      setInput(transcript.trim());
+
+      const normalizedTranscript = transcript.trim();
+      if (!normalizedTranscript) {
+        setError("Речь не распознана. Попробуй говорить чуть дольше после нажатия на запись.");
+        return;
+      }
+
+      setInput(normalizedTranscript);
       setInputSource("voice");
+      setError("");
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
+
+    try {
+      recognition.start();
+    } catch {
+      setIsRecording(false);
+      recognitionRef.current = null;
+      setError("Не удалось запустить голосовой ввод. На iPhone попробуй обновить страницу и разрешить доступ к микрофону в Safari.");
+    }
   }
 
   async function streamText(input: {
@@ -158,6 +202,24 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
     turnNumber?: number;
     onUpdate: (text: string) => void;
   }) {
+    if (input.phase === "conversation") {
+      try {
+        const previewResponse = await fetch("/api/prompt-preview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: input.messages, scenario: input.scenario, phase: input.phase, turnNumber: input.turnNumber }),
+        });
+        const previewPayload = (await previewResponse.json()) as { prompt?: string; error?: string };
+        if (previewResponse.ok && previewPayload.prompt) {
+          console.log("[client] prompt sent to AI:\n" + previewPayload.prompt);
+        } else {
+          console.warn("[client] prompt preview unavailable", previewPayload.error || "unknown error");
+        }
+      } catch (previewError) {
+        console.warn("[client] prompt preview request failed", previewError);
+      }
+    }
+
     const response = await fetch("/api/chat-stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -288,6 +350,26 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
         <div className="note-card"><h3>Активный режим</h3><p>{getModeHint(mode)}</p></div>
       </aside>
       <div className="trainer-panel trainer-panel--chat">
+        {scenario ? (
+          <section className="manager-card trainer-client-profile">
+            <div className="manager-card__header">
+              <div>
+                <span className="pill pill--soft">Профиль клиентки</span>
+                <h2>Контекст текущей тренировки</h2>
+              </div>
+            </div>
+            <div className="trainer-config__grid">
+              <label>
+                <span>Имя / возраст / общий профиль</span>
+                <textarea value={scenario.persona} readOnly rows={3} />
+              </label>
+              <label>
+                <span>Пробное занятие / впечатление</span>
+                <textarea value={`Направление: ${scenario.lessonDirection}\n${scenario.lessonImpression}`} readOnly rows={3} />
+              </label>
+            </div>
+          </section>
+        ) : null}
         <div className="chat-window">
           {messages.length === 0 ? <div className="chat-placeholder"><h3>Тренировка еще не запущена</h3><p>Выберите сложность, количество шагов и нажмите «Начать тренировку». После этого в чат придет только первая реплика клиентки.</p></div> : messages.map((message, index) => (
             <article key={`${message.role}-${index}`} className={`message-bubble ${message.role === "assistant" ? "message-bubble--assistant" : "message-bubble--user"}`} ref={index === messages.length - 1 ? lastBubbleRef : null}>

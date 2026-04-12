@@ -20,6 +20,7 @@ const personas = [
   {
     persona:
       "Анна, 31 год. Работает в офисе, хочет красивую осанку и больше энергии, но считает расходы очень взвешенно.",
+    lessonDirection: "барре",
     lessonImpression:
       "Пробное понравилось, атмосфера зацепила, тренер произвел хорошее впечатление.",
     purchaseSignal:
@@ -28,6 +29,7 @@ const personas = [
   {
     persona:
       "Екатерина, 27 лет. Никогда не занималась балетом, давно мечтает тянуться на шпагат, но стесняется своего уровня.",
+    lessonDirection: "растяжка",
     lessonImpression:
       "После пробного вдохновилась, но переживает, что не справится и быстро выпадет из процесса.",
     purchaseSignal:
@@ -36,10 +38,29 @@ const personas = [
   {
     persona:
       "Мария, 36 лет. Мама двоих детей, ищет формат для восстановления ресурса и женского состояния, но живет в очень плотном графике.",
+    lessonDirection: "пилатес",
     lessonImpression:
       "Пробное занятие дало приятные эмоции, но она сомневается, сможет ли встроить занятия в неделю.",
     purchaseSignal:
       "Для покупки ей нужен реалистичный сценарий по времени и регулярности.",
+  },
+  {
+    persona:
+      "Ольга, 42 года. Работает в продажах, много стоит и устает к вечеру, хочет подтянуть тело и снять напряжение со спины.",
+    lessonDirection: "здоровая спина",
+    lessonImpression:
+      "На пробном почувствовала, что нагрузка мягкая и приятная, но пока не уверена, что будет видеть результат.",
+    purchaseSignal:
+      "Ей важно понять, что тренировки реально помогут самочувствию и осанке, а не просто дадут разовый приятный эффект.",
+  },
+  {
+    persona:
+      "Дарья, 24 года. Любит красивую подачу и эстетику, хочет заниматься для фигуры и удовольствия, но быстро остывает, если скучно.",
+    lessonDirection: "боди-балет",
+    lessonImpression:
+      "Пробное показалось красивым и необычным, но она пока сомневается, что удержит дисциплину.",
+    purchaseSignal:
+      "Ей нужен эмоциональный отклик, ощущение, что формат вдохновляет и в него захочется возвращаться.",
   },
 ];
 
@@ -97,10 +118,16 @@ function getObjectionPoolByDifficulty(
 
 export async function buildScenario(options?: {
   city?: string;
+  ownerEmail?: string;
   difficulty?: ScenarioDifficulty;
   stepCount?: number;
 }) {
-  const activeObjections = await listActiveObjections(options?.city || "Краснодар");
+  const ownerEmail = options?.ownerEmail?.trim().toLowerCase();
+  if (!ownerEmail) {
+    throw new Error("Не найден владелец сценария для загрузки возражений.");
+  }
+
+  const activeObjections = await listActiveObjections(ownerEmail);
 
   if (activeObjections.length === 0) {
     throw new Error("Нет активных возражений для тренировки.");
@@ -123,8 +150,10 @@ export async function buildScenario(options?: {
 
   return {
     city: options?.city || "Краснодар",
+    ownerEmail,
     objectionIds: selectedObjections.map((objection) => objection.id),
     persona: selectedPersona.persona,
+    lessonDirection: selectedPersona.lessonDirection,
     lessonImpression: selectedPersona.lessonImpression,
     purchaseSignal: selectedPersona.purchaseSignal,
     difficulty,
@@ -151,17 +180,17 @@ function getTurnPhaseGuidance(stepCount: number, turnNumber: number) {
   return "Это середина диалога. Сохраняй интерес к студии, но продолжай проверять администратора вопросами, уточнениями и реалистичными сомнениями.";
 }
 
-async function buildConversationPrompt(input: {
+export async function buildConversationPrompt(input: {
   scenario: ScenarioContext;
   currentObjection: ObjectionRecord;
   messages: ChatMessage[];
   turnNumber: number;
 }) {
   const { scenario, currentObjection, messages, turnNumber } = input;
-  const basePrompt = getSetting("trainer_prompt", scenario.city || "Краснодар");
+  const basePrompt = getSetting("trainer_prompt", scenario.ownerEmail || "");
   const transcript = getTranscript(messages);
 
-  return [
+  const finalPrompt = [
     "Ты играешь только роль клиентки студии балета и растяжки LEVITA после пробного занятия.",
     basePrompt,
     "",
@@ -171,6 +200,7 @@ async function buildConversationPrompt(input: {
     "",
     "Детали клиентки:",
     scenario.persona,
+    `Пробное занятие было по направлению: ${scenario.lessonDirection}`,
     `Впечатление после пробного: ${scenario.lessonImpression}`,
     `Что может склонить к покупке: ${scenario.purchaseSignal}`,
     `Выбранная сложность сценария: ${scenario.difficulty}`,
@@ -206,10 +236,16 @@ async function buildConversationPrompt(input: {
   ]
     .filter(Boolean)
     .join("\n");
+
+  if (turnNumber === 1) {
+    console.log("[trainer] full conversation prompt for first turn:\n" + finalPrompt);
+  }
+
+  return finalPrompt;
 }
 
 async function buildEvaluationPrompt(scenario: ScenarioContext, objections: ObjectionRecord[], messages: ChatMessage[]) {
-  const basePrompt = await getSetting("trainer_prompt", scenario.city || "Краснодар");
+  const basePrompt = await getSetting("trainer_prompt", scenario.ownerEmail || "");
   const transcript = getTranscript(messages);
   const objectionsSummary = objections
     .map((objection, index) => `${index + 1}. ${objection.title}: ${objection.objectionText}`)
@@ -526,7 +562,7 @@ export async function streamTrainerReply(input: {
   turnNumber?: number;
 }) {
   const { messages, scenario, phase } = input;
-  const objections = await getObjectionsByIds(scenario.objectionIds);
+  const objections = await getObjectionsByIds(scenario.objectionIds, scenario.ownerEmail);
 
   if (objections.length === 0) {
     throw new Error("Сценарий не найден в библиотеке возражений.");

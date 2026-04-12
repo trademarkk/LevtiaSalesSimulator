@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Только руководитель может видеть настройки." }, { status: 403 });
   }
 
-  return NextResponse.json({ prompt: await getSetting("trainer_prompt", session.name) });
+  return NextResponse.json({ prompt: await getSetting("trainer_prompt", session.email) });
 }
 
 export async function PUT(request: Request) {
@@ -35,7 +35,7 @@ export async function PUT(request: Request) {
 
   try {
     const body = managerSettingsSchema.parse(await request.json());
-    const prompt = await setSetting("trainer_prompt", body.trainerPrompt, session.name);
+    const prompt = await setSetting("trainer_prompt", body.trainerPrompt, session.email, session.city || session.name);
     return NextResponse.json({ prompt });
   } catch (error) {
     const message =

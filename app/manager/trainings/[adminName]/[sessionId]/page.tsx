@@ -35,7 +35,7 @@ export default async function TrainingSessionDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const training = await getTrainingSessionById(trainingId, session.name);
+  const training = await getTrainingSessionById(trainingId, session.email);
 
   if (!training || training.adminDisplayName !== resolvedName) {
     notFound();

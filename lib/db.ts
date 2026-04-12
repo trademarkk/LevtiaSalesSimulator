@@ -54,6 +54,46 @@ const defaultObjectionSeeds: ObjectionSeed[] = [
   { title: "Не могу говорить сейчас", objectionText: "Сейчас не могу говорить, давайте продолжим завтра.", stage: "follow_up", difficulty: "easy", isActive: 1 },
   { title: "Посмотрю на самочувствие завтра", objectionText: "Мне надо понять, как я буду себя чувствовать завтра, и потом уже решать.", stage: "health", difficulty: "medium", isActive: 1 },
   { title: "Перезвоню сама позже", objectionText: "Я сама вам позвоню позже, когда закончу свои дела.", stage: "follow_up", difficulty: "medium", isActive: 1 },
+  { title: "Не могу определиться, смотрю другие студии", objectionText: "Не могу определиться , все подходит , но хочу ещё посмотреть другие студии , уже записана на завтра туда", stage: "comparison", difficulty: "medium", isActive: 1 },
+  { title: "Подвернула ногу", objectionText: "У меня сейчас нога травмирована ( подвернула ) , пока записываться никуда не буду", stage: "health", difficulty: "hard", isActive: 1 },
+  { title: "Продолжим завтра", objectionText: "Сейчас не могу говорить , давайте завтра продолжим диалог", stage: "follow_up", difficulty: "easy", isActive: 1 },
+  { title: "Посмотрю по самочувствию", objectionText: "надо посмотреть как буду чувствовать себя завтра", stage: "health", difficulty: "medium", isActive: 1 },
+  { title: "Сама позвоню", objectionText: "я сама вам позвоню , все знаю , но сама , как дела закончатся", stage: "follow_up", difficulty: "medium", isActive: 1 },
+  { title: "Завал на работе", objectionText: "С работой завал , как только появится время , сама напишу , работа 25/8", stage: "schedule", difficulty: "medium", isActive: 1 },
+  { title: "Сначала к врачу", objectionText: "Я завтра записана к врачу ,мне надо у него узнать можно ли мне заниматься", stage: "health", difficulty: "hard", isActive: 1 },
+  { title: "Надо посоветоваться с мужем из-за оплаты", objectionText: "Надо посоветоваться с мужем ,так как у меня нет карт и оформляю все на него", stage: "authority", difficulty: "hard", isActive: 1 },
+  { title: "Позвоните после нового года", objectionText: "Много работы ,праздники скоро ,позвоните после нового года", stage: "follow_up", difficulty: "medium", isActive: 1 },
+  { title: "Нашла студию по 100 рублей", objectionText: "500-600 рулей это дорого для одного занятия ,я нашла студию где тренировка стоит 100 рублей", stage: "price", difficulty: "hard", isActive: 1 },
+  { title: "Нет личных шкафчиков", objectionText: "у вас нет шкафчиков личных", stage: "conditions", difficulty: "easy", isActive: 1 },
+  { title: "Уже купила абонемент в спортзал", objectionText: "Я уже купила абонемент в спортзал ,там дешевле ", stage: "comparison", difficulty: "medium", isActive: 1 },
+  { title: "Не вижу ценности переплаты", objectionText: "Дорого — не вижу, за что переплачивать.", stage: "price", difficulty: "hard", isActive: 1 },
+  { title: "Оплачу завтра", objectionText: "я могу оплатить полностью не проблема ,только завтра", stage: "follow_up", difficulty: "easy", isActive: 1 },
+  { title: "Начну с весны", objectionText: "Сейчас не могу заниматься ,начну с весны", stage: "timing", difficulty: "medium", isActive: 1 },
+  { title: "Я не в Краснодаре", objectionText: "Я не в Краснодаре ,а вы мне про какие тренировки говорите ,я вам не буду отвечать больше", stage: "location", difficulty: "hard", isActive: 1 },
+  { title: "Сначала спортзал, потом решу", objectionText: "я сначала схожу в спортзал на пробное и потом приму решение куда хочу больше ходить в бассейн или к вам", stage: "comparison", difficulty: "medium", isActive: 1 },
+  { title: "Неактуально", objectionText: "мне больше неактуально ,не хочу заниматься", stage: "decision", difficulty: "medium", isActive: 1 },
+  { title: "Уезжаю через 2 месяца", objectionText: "я уезжаю через 2 месяца ,хочу платить поразово", stage: "timing", difficulty: "medium", isActive: 1 },
+  { title: "Сначала другую студию", objectionText: "надо сначала посмотреть студию другую,потом понять хочу я к вам нет", stage: "comparison", difficulty: "medium", isActive: 1 },
+  { title: "Не будет рассрочек, поговорю с мужем", objectionText: "я знаю ,что у меня не будет рассрочек ,кредитов ,поэтому я поговорю с мужем и если он разрешит оформим на него", stage: "authority", difficulty: "hard", isActive: 1 },
+  { title: "Подумать", objectionText: "Мне нужно подумать.", stage: "hesitation", difficulty: "medium", isActive: 1 },
+  { title: "Нет времени из-за работы и детей", objectionText: "Нет времени из-за работы/детей.", stage: "schedule", difficulty: "medium", isActive: 1 },
+  { title: "Неудобная локация", objectionText: "Далеко ездить, неудобная локация.", stage: "location", difficulty: "medium", isActive: 1 },
+  { title: "Хочу сравнить студии", objectionText: "Хочу сравнить с другими студиями.", stage: "comparison", difficulty: "medium", isActive: 1 },
+  { title: "Боюсь травм, спина и колени", objectionText: "Боюсь травм — слабая спина/колени.", stage: "health", difficulty: "hard", isActive: 1 },
+  { title: "Слишком сложно", objectionText: "Слишком сложно, не получится повторять.", stage: "confidence", difficulty: "medium", isActive: 1 },
+  { title: "Не уверена, что буду ходить регулярно", objectionText: "Не уверена, что буду ходить регулярно.", stage: "schedule", difficulty: "medium", isActive: 1 },
+  { title: "Абонемент в другом зале", objectionText: "У меня уже есть абонемент в другом зале.", stage: "comparison", difficulty: "medium", isActive: 1 },
+  { title: "Сначала похудею", objectionText: "Сначала похудею/подтянусь — потом приду.", stage: "confidence", difficulty: "medium", isActive: 1 },
+  { title: "Партнёр против", objectionText: "Муж/партнёр против — считает это пустой тратой.", stage: "authority", difficulty: "hard", isActive: 1 },
+  { title: "Сенсорный дискомфорт", objectionText: "Сенсорный дискомфорт: не люблю зеркала и громкую музыку.", stage: "conditions", difficulty: "medium", isActive: 1 },
+  { title: "Стесняюсь группы", objectionText: "Стесняюсь группы — боюсь, что будут смотреть/снимать.", stage: "confidence", difficulty: "medium", isActive: 1 },
+  { title: "Медицинские нюансы", objectionText: "Медицинские нюансы: плоскостопие/сколиоз/после травмы.", stage: "health", difficulty: "hard", isActive: 1 },
+  { title: "Беременность или послеродовой период", objectionText: "Беременность/послеродовой период — страшно навредить.", stage: "health", difficulty: "hard", isActive: 1 },
+  { title: "Нестабильный доход", objectionText: "Нестабильный доход — не готова к помесячной оплате.", stage: "price", difficulty: "hard", isActive: 1 },
+  { title: "Командировки и переезды", objectionText: "Частые командировки/переезды — абонемент «сгорит».", stage: "schedule", difficulty: "medium", isActive: 1 },
+  { title: "Не устраивает расписание", objectionText: "Не устраивает расписание — нет моих окон утром/поздно.", stage: "schedule", difficulty: "medium", isActive: 1 },
+  { title: "Не доверяю обещаниям", objectionText: "Не доверяю обещаниям — у всех одинаковый маркетинг.", stage: "trust", difficulty: "hard", isActive: 1 },
+  { title: "Не хочу оставлять данные", objectionText: "Не хочу оставлять данные/вступать в чаты и рассылки.", stage: "privacy", difficulty: "medium", isActive: 1 },
 ];
 
 function buildDefaultTrainerPrompt(city: string) {
@@ -130,6 +170,11 @@ function getDefaultCoachHint(stage: string) {
     case "comparison": return "Сравнивайте не только цену, но и атмосферу, сопровождение, безопасность и итоговый результат.";
     case "health": return "Отрабатывайте бережно: уточняйте ограничения и переводите разговор в плоскость безопасного подбора нагрузки.";
     case "follow_up": return "Не отпускайте диалог без понятного следующего касания: время, формат и повод вернуться к разговору.";
+    case "decision": return "Не спорьте в лоб: найдите истинную причину жесткого отказа и проверьте, можно ли вернуть клиентку в диалог через ценность и уместный следующий шаг.";
+    case "timing": return "Поймите, это реальная временная пауза или мягкий отказ, и зафиксируйте конкретную точку возврата к разговору.";
+    case "conditions": return "Разберите бытовой или организационный барьер и покажите, насколько он критичен для результата и комфорта клиентки.";
+    case "trust": return "Снимайте недоверие фактами, конкретикой и спокойной прозрачной аргументацией без продавливания.";
+    case "privacy": return "Уважайте границы клиентки и объясняйте, зачем нужны данные и как можно продолжить диалог без лишнего давления.";
     default: return "Уточняйте истинную причину сомнения и переводите разговор к ценности абонемента для клиентки.";
   }
 }
@@ -157,6 +202,7 @@ function normalizeUser(row: DbRow): UserRecord {
     role: row.role as UserRecord["role"],
     name: String(row.name),
     city: String(row.city ?? row.name ?? ""),
+    managerEmail: row.manager_email ? String(row.manager_email) : null,
     status: String(row.status ?? "active") as UserRecord["status"],
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
   };
@@ -201,39 +247,99 @@ function extractTrainingScore(evaluationText: string) {
   return Number.isFinite(score) ? score : null;
 }
 
-export async function ensureCityData(city: string) {
-  const normalizedCity = city.trim();
-  if (!normalizedCity) return;
+function normalizeObjectionIdentity(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[«»"'`]/g, "")
+    .replace(/[—–-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function mapSeedToDbRow(objection: ObjectionSeed) {
+  return {
+    title: objection.title,
+    objection_text: objection.objectionText,
+    coach_hint: objection.coachHint ?? getDefaultCoachHint(objection.stage),
+    stage: objection.stage,
+    difficulty: objection.difficulty,
+    is_active: Boolean(objection.isActive),
+    is_required: Boolean(objection.isRequired ?? 0),
+  };
+}
+
+async function insertMissingObjectionsForOwner(input: { city: string; ownerEmail: string }) {
+  const normalizedCity = input.city.trim();
+  const normalizedOwnerEmail = input.ownerEmail.trim().toLowerCase();
+  if (!normalizedCity || !normalizedOwnerEmail) return { inserted: 0, skipped: 0 };
 
   const db = getPool();
-  const existingPrompt = await db.query("SELECT value FROM settings WHERE key = $1 AND city = $2 LIMIT 1", ["trainer_prompt", normalizedCity]);
-  if (existingPrompt.rowCount === 0) {
-    await db.query("INSERT INTO settings (key, value, city, updated_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT (key, city) DO NOTHING", ["trainer_prompt", buildDefaultTrainerPrompt(normalizedCity), normalizedCity]);
+  const existing = await db.query("SELECT title, objection_text FROM objections WHERE owner_email = $1", [normalizedOwnerEmail]);
+  const existingKeys = new Set(
+    existing.rows.flatMap((row) => [
+      normalizeObjectionIdentity(String(row.objection_text ?? "")),
+      normalizeObjectionIdentity(String(row.title ?? "")),
+    ]).filter(Boolean),
+  );
+
+  let inserted = 0;
+  let skipped = 0;
+
+  for (const row of defaultObjectionSeeds.map(mapSeedToDbRow)) {
+    const textKey = normalizeObjectionIdentity(String(row.objection_text));
+    const titleKey = normalizeObjectionIdentity(String(row.title));
+    if ((textKey && existingKeys.has(textKey)) || (titleKey && existingKeys.has(titleKey))) {
+      skipped += 1;
+      continue;
+    }
+
+    await db.query(
+      `INSERT INTO objections (title, objection_text, coach_hint, stage, difficulty, is_active, is_required, city, owner_email, updated_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())`,
+      [String(row.title), String(row.objection_text), String(row.coach_hint ?? ""), String(row.stage), String(row.difficulty), Boolean(row.is_active), Boolean(row.is_required), normalizedCity, normalizedOwnerEmail],
+    );
+
+    if (textKey) existingKeys.add(textKey);
+    if (titleKey) existingKeys.add(titleKey);
+    inserted += 1;
   }
 
-  const hasAnyObjections = await db.query("SELECT COUNT(*)::int AS count FROM objections WHERE city = $1", [normalizedCity]);
-  if (Number(hasAnyObjections.rows[0]?.count || 0) > 0) return;
+  return { inserted, skipped };
+}
 
-  const krasnodarRows = await db.query("SELECT title, objection_text, coach_hint, stage, difficulty, is_active, is_required FROM objections WHERE city = $1 ORDER BY id ASC", ["Краснодар"]);
-  const sourceRows = (krasnodarRows.rowCount ?? 0) > 0
-    ? krasnodarRows.rows
-    : defaultObjectionSeeds.map((objection) => ({
-        title: objection.title,
-        objection_text: objection.objectionText,
-        coach_hint: objection.coachHint ?? getDefaultCoachHint(objection.stage),
-        stage: objection.stage,
-        difficulty: objection.difficulty,
-        is_active: Boolean(objection.isActive),
-        is_required: Boolean(objection.isRequired ?? 0),
-      }));
+export async function ensureManagerData(input: { city: string; ownerEmail: string }) {
+  const normalizedCity = input.city.trim();
+  const normalizedOwnerEmail = input.ownerEmail.trim().toLowerCase();
+  if (!normalizedCity || !normalizedOwnerEmail) return;
 
-  for (const row of sourceRows) {
+  const db = getPool();
+  const existingPrompt = await db.query("SELECT value FROM settings WHERE key = $1 AND owner_email = $2 LIMIT 1", ["trainer_prompt", normalizedOwnerEmail]);
+  if (existingPrompt.rowCount === 0) {
     await db.query(
-      `INSERT INTO objections (title, objection_text, coach_hint, stage, difficulty, is_active, is_required, city, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())`,
-      [String(row.title), String(row.objection_text), String(row.coach_hint ?? ""), String(row.stage), String(row.difficulty), Boolean(row.is_active), Boolean(row.is_required), normalizedCity],
+      "INSERT INTO settings (key, value, city, owner_email, updated_at) VALUES ($1, $2, $3, $4, NOW()) ON CONFLICT (key, owner_email) DO NOTHING",
+      ["trainer_prompt", buildDefaultTrainerPrompt(normalizedCity), normalizedCity, normalizedOwnerEmail],
     );
   }
+
+  await insertMissingObjectionsForOwner({ city: normalizedCity, ownerEmail: normalizedOwnerEmail });
+}
+
+export async function ensureAllManagersHaveDefaultObjections() {
+  const db = getPool();
+  const result = await db.query("SELECT DISTINCT email, city FROM users WHERE role = 'manager' AND email IS NOT NULL AND city IS NOT NULL AND TRIM(city) <> '' ORDER BY email ASC");
+  const summary: Array<{ ownerEmail: string; city: string; inserted: number; skipped: number }> = [];
+
+  for (const row of result.rows) {
+    const ownerEmail = String(row.email ?? "").trim().toLowerCase();
+    const city = String(row.city ?? "").trim();
+    if (!city || !ownerEmail) continue;
+    await ensureManagerData({ city, ownerEmail });
+    const sync = await insertMissingObjectionsForOwner({ city, ownerEmail });
+    summary.push({ ownerEmail, city, inserted: sync.inserted, skipped: sync.skipped });
+  }
+
+  return summary;
 }
 
 async function getOne<T>(query: string, values: unknown[] = [], normalizer?: (row: DbRow) => T): Promise<T | null> {
@@ -250,19 +356,21 @@ export async function getUserById(id: number) {
   return getOne("SELECT * FROM users WHERE id = $1 LIMIT 1", [id], normalizeUser);
 }
 
-export async function createAdminUser(input: { city: string; email: string; password: string; name?: string }) {
+export async function createAdminUser(input: { city: string; email: string; password: string; name?: string; managerEmail?: string }) {
   const normalizedEmail = input.email.trim().toLowerCase();
   const normalizedCity = input.city.trim();
   const normalizedName = input.name?.trim() || normalizedCity;
+  const normalizedManagerEmail = input.managerEmail?.trim().toLowerCase() || null;
   if (!normalizedCity) throw new Error("Укажите город.");
+  if (!normalizedManagerEmail) throw new Error("Не найден email руководителя для привязки администратора.");
   if (await getUserByEmail(normalizedEmail)) throw new Error("Пользователь с таким email уже существует.");
 
   await getPool().query(
-    "INSERT INTO users (email, password_hash, role, name, city, status) VALUES ($1, $2, 'admin', $3, $4, 'active')",
-    [normalizedEmail, hashPassword(input.password), normalizedName, normalizedCity],
+    "INSERT INTO users (email, password_hash, role, name, city, manager_email, status) VALUES ($1, $2, 'admin', $3, $4, $5, 'active')",
+    [normalizedEmail, hashPassword(input.password), normalizedName, normalizedCity, normalizedManagerEmail],
   );
 
-  await ensureCityData(normalizedCity);
+  await ensureManagerData({ city: normalizedCity, ownerEmail: normalizedManagerEmail });
   return getUserByEmail(normalizedEmail);
 }
 
@@ -274,32 +382,36 @@ export async function createManagerInvite(input: { city: string; email?: string 
   return { code, city, email: input.email?.trim().toLowerCase() || null };
 }
 
-export async function listAdminAccounts(city: string) {
+export async function listAdminAccounts(ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
   const result = await getPool().query(
     `SELECT u.id, u.name, u.email, u.city, u.status, u.created_at, COUNT(ts.id) AS training_count, MAX(ts.completed_at) AS last_training_at
      FROM users u
-     LEFT JOIN training_sessions ts ON ts.admin_user_id = u.id AND ts.city = u.city
-     WHERE u.role = 'admin' AND u.city = $1
+     LEFT JOIN training_sessions ts ON ts.admin_user_id = u.id AND ts.owner_email = $1
+     WHERE u.role = 'admin' AND u.manager_email = $1
      GROUP BY u.id, u.name, u.email, u.city, u.status, u.created_at
      ORDER BY u.created_at DESC`,
-    [city],
+    [normalizedOwnerEmail],
   );
   return result.rows as Array<Record<string, unknown>>;
 }
 
-export async function setAdminStatus(id: number, city: string, status: "active" | "disabled") {
-  await getPool().query("UPDATE users SET status = $1 WHERE id = $2 AND city = $3 AND role = 'admin'", [status, id, city]);
-  return listAdminAccounts(city);
+export async function setAdminStatus(id: number, ownerEmail: string, status: "active" | "disabled") {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  await getPool().query("UPDATE users SET status = $1 WHERE id = $2 AND manager_email = $3 AND role = 'admin'", [status, id, normalizedOwnerEmail]);
+  return listAdminAccounts(normalizedOwnerEmail);
 }
 
-export async function resetAdminPassword(id: number, city: string, password: string) {
-  await getPool().query("UPDATE users SET password_hash = $1 WHERE id = $2 AND city = $3 AND role = 'admin'", [hashPassword(password), id, city]);
+export async function resetAdminPassword(id: number, ownerEmail: string, password: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  await getPool().query("UPDATE users SET password_hash = $1 WHERE id = $2 AND manager_email = $3 AND role = 'admin'", [hashPassword(password), id, normalizedOwnerEmail]);
   return true;
 }
 
-export async function deleteAdminAccount(id: number, city: string) {
-  await getPool().query("DELETE FROM users WHERE id = $1 AND city = $2 AND role = 'admin'", [id, city]);
-  return listAdminAccounts(city);
+export async function deleteAdminAccount(id: number, ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  await getPool().query("DELETE FROM users WHERE id = $1 AND manager_email = $2 AND role = 'admin'", [id, normalizedOwnerEmail]);
+  return listAdminAccounts(normalizedOwnerEmail);
 }
 
 export async function createManagerUserFromInvite(input: { code: string; city: string; email: string; password: string }) {
@@ -314,31 +426,33 @@ export async function createManagerUserFromInvite(input: { code: string; city: s
   if (await getUserByEmail(normalizedEmail)) throw new Error("Пользователь с таким email уже существует.");
 
   await getPool().query(
-    "INSERT INTO users (email, password_hash, role, name, city, status) VALUES ($1, $2, 'manager', $3, $4, 'active')",
-    [normalizedEmail, hashPassword(input.password), normalizedCity, normalizedCity],
+    "INSERT INTO users (email, password_hash, role, name, city, manager_email, status) VALUES ($1, $2, 'manager', $3, $4, $5, 'active')",
+    [normalizedEmail, hashPassword(input.password), normalizedCity, normalizedCity, normalizedEmail],
   );
   await getPool().query("UPDATE manager_invites SET is_used = TRUE, used_at = NOW() WHERE code = $1", [normalizedCode]);
-  await ensureCityData(normalizedCity);
+  await ensureManagerData({ city: normalizedCity, ownerEmail: normalizedEmail });
   return getUserByEmail(normalizedEmail);
 }
 
-export async function listObjections(city: string) {
-  const result = await getPool().query("SELECT * FROM objections WHERE city = $1 ORDER BY is_required DESC, is_active DESC, updated_at DESC, id DESC", [city]);
+export async function listObjections(ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  const result = await getPool().query("SELECT * FROM objections WHERE owner_email = $1 ORDER BY is_required DESC, is_active DESC, updated_at DESC, id DESC", [normalizedOwnerEmail]);
   return result.rows.map((row) => normalizeObjection(row as DbRow));
 }
 
-export async function listActiveObjections(city: string) {
-  const result = await getPool().query("SELECT * FROM objections WHERE is_active = TRUE AND city = $1 ORDER BY is_required DESC, id DESC", [city]);
+export async function listActiveObjections(ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  const result = await getPool().query("SELECT * FROM objections WHERE is_active = TRUE AND owner_email = $1 ORDER BY is_required DESC, id DESC", [normalizedOwnerEmail]);
   return result.rows.map((row) => normalizeObjection(row as DbRow));
 }
 
-export async function getObjectionsByIds(ids: number[], city?: string) {
+export async function getObjectionsByIds(ids: number[], ownerEmail?: string) {
   if (!ids.length) return [];
   const values: unknown[] = [ids];
   let query = "SELECT * FROM objections WHERE id = ANY($1::int[])";
-  if (city) {
-    values.push(city);
-    query += " AND city = $2";
+  if (ownerEmail) {
+    values.push(ownerEmail.trim().toLowerCase());
+    query += " AND owner_email = $2";
   }
   query += " ORDER BY id ASC";
   const result = await getPool().query(query, values);
@@ -347,58 +461,65 @@ export async function getObjectionsByIds(ids: number[], city?: string) {
   return ids.map((id) => rowsById.get(id)).filter((row): row is ObjectionRecord => Boolean(row));
 }
 
-export async function createObjection(input: { title: string; objectionText: string; coachHint: string; stage: string; difficulty: "easy" | "medium" | "hard"; isActive: boolean; isRequired: boolean; city: string; }) {
+export async function createObjection(input: { title: string; objectionText: string; coachHint: string; stage: string; difficulty: "easy" | "medium" | "hard"; isActive: boolean; isRequired: boolean; city: string; ownerEmail: string; }) {
   const city = input.city.trim();
+  const ownerEmail = input.ownerEmail.trim().toLowerCase();
   await getPool().query(
-    `INSERT INTO objections (title, objection_text, coach_hint, stage, difficulty, is_active, is_required, city, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())`,
-    [input.title.trim(), input.objectionText.trim(), input.coachHint.trim(), input.stage.trim(), input.difficulty, input.isActive, input.isRequired, city],
+    `INSERT INTO objections (title, objection_text, coach_hint, stage, difficulty, is_active, is_required, city, owner_email, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())`,
+    [input.title.trim(), input.objectionText.trim(), input.coachHint.trim(), input.stage.trim(), input.difficulty, input.isActive, input.isRequired, city, ownerEmail],
   );
-  return listObjections(city);
+  return listObjections(ownerEmail);
 }
 
-export async function updateObjection(id: number, input: { title: string; objectionText: string; coachHint: string; stage: string; difficulty: "easy" | "medium" | "hard"; isActive: boolean; isRequired: boolean; city: string; }) {
+export async function updateObjection(id: number, input: { title: string; objectionText: string; coachHint: string; stage: string; difficulty: "easy" | "medium" | "hard"; isActive: boolean; isRequired: boolean; city: string; ownerEmail: string; }) {
   const city = input.city.trim();
+  const ownerEmail = input.ownerEmail.trim().toLowerCase();
   await getPool().query(
-    `UPDATE objections SET title = $1, objection_text = $2, coach_hint = $3, stage = $4, difficulty = $5, is_active = $6, is_required = $7, updated_at = NOW()
-     WHERE id = $8 AND city = $9`,
-    [input.title.trim(), input.objectionText.trim(), input.coachHint.trim(), input.stage.trim(), input.difficulty, input.isActive, input.isRequired, id, city],
+    `UPDATE objections SET title = $1, objection_text = $2, coach_hint = $3, stage = $4, difficulty = $5, is_active = $6, is_required = $7, city = $8, updated_at = NOW()
+     WHERE id = $9 AND owner_email = $10`,
+    [input.title.trim(), input.objectionText.trim(), input.coachHint.trim(), input.stage.trim(), input.difficulty, input.isActive, input.isRequired, city, id, ownerEmail],
   );
-  return listObjections(city);
+  return listObjections(ownerEmail);
 }
 
-export async function setObjectionActive(id: number, isActive: boolean, city: string) {
-  await getPool().query("UPDATE objections SET is_active = $1, updated_at = NOW() WHERE id = $2 AND city = $3", [isActive, id, city]);
-  return listObjections(city);
+export async function setObjectionActive(id: number, isActive: boolean, ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  await getPool().query("UPDATE objections SET is_active = $1, updated_at = NOW() WHERE id = $2 AND owner_email = $3", [isActive, id, normalizedOwnerEmail]);
+  return listObjections(normalizedOwnerEmail);
 }
 
-export async function setObjectionRequired(id: number, isRequired: boolean, city: string) {
-  await getPool().query("UPDATE objections SET is_required = $1, updated_at = NOW() WHERE id = $2 AND city = $3", [isRequired, id, city]);
-  return listObjections(city);
+export async function setObjectionRequired(id: number, isRequired: boolean, ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  await getPool().query("UPDATE objections SET is_required = $1, updated_at = NOW() WHERE id = $2 AND owner_email = $3", [isRequired, id, normalizedOwnerEmail]);
+  return listObjections(normalizedOwnerEmail);
 }
 
-export async function deleteObjection(id: number, city: string) {
-  await getPool().query("DELETE FROM objections WHERE id = $1 AND city = $2", [id, city]);
-  return listObjections(city);
+export async function deleteObjection(id: number, ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  await getPool().query("DELETE FROM objections WHERE id = $1 AND owner_email = $2", [id, normalizedOwnerEmail]);
+  return listObjections(normalizedOwnerEmail);
 }
 
-export async function createTrainingSession(input: { adminDisplayName: string; adminUserId?: number | null; city: string; scenario: ScenarioContext; trainerMode: TrainerMode; evaluationText: string; transcript: ChatMessage[]; startedAt: string; completedAt?: string; }) {
+export async function createTrainingSession(input: { adminDisplayName: string; adminUserId?: number | null; city: string; ownerEmail: string; scenario: ScenarioContext; trainerMode: TrainerMode; evaluationText: string; transcript: ChatMessage[]; startedAt: string; completedAt?: string; }) {
   const completedAt = input.completedAt || new Date().toISOString();
+  const ownerEmail = input.ownerEmail.trim().toLowerCase();
   await getPool().query(
-    `INSERT INTO training_sessions (admin_display_name, admin_user_id, city, scenario_difficulty, step_count, trainer_mode, evaluation_text, score, transcript_json, started_at, completed_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-    [input.adminDisplayName.trim(), input.adminUserId ?? null, input.city.trim(), input.scenario.difficulty, input.scenario.stepCount, input.trainerMode, input.evaluationText.trim(), extractTrainingScore(input.evaluationText), JSON.stringify(input.transcript), input.startedAt, completedAt],
+    `INSERT INTO training_sessions (admin_display_name, admin_user_id, city, owner_email, scenario_difficulty, step_count, trainer_mode, evaluation_text, score, transcript_json, started_at, completed_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [input.adminDisplayName.trim(), input.adminUserId ?? null, input.city.trim(), ownerEmail, input.scenario.difficulty, input.scenario.stepCount, input.trainerMode, input.evaluationText.trim(), extractTrainingScore(input.evaluationText), JSON.stringify(input.transcript), input.startedAt, completedAt],
   );
 }
 
-export async function listTrainingAdministrators(city: string) {
+export async function listTrainingAdministrators(ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
   const result = await getPool().query(
     `SELECT admin_display_name, COUNT(*) AS session_count, AVG(score) AS average_score, MAX(completed_at) AS last_completed_at
      FROM training_sessions
-     WHERE city = $1
+     WHERE owner_email = $1
      GROUP BY admin_display_name
      ORDER BY last_completed_at DESC, admin_display_name ASC`,
-    [city],
+    [normalizedOwnerEmail],
   );
 
   return result.rows.map((row) => ({
@@ -409,40 +530,44 @@ export async function listTrainingAdministrators(city: string) {
   })) satisfies TrainingAdministratorSummary[];
 }
 
-export async function listTrainingSessionsByAdministrator(adminDisplayName: string, city: string) {
+export async function listTrainingSessionsByAdministrator(adminDisplayName: string, ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
   const result = await getPool().query(
-    `SELECT * FROM training_sessions WHERE admin_display_name = $1 AND city = $2 ORDER BY completed_at DESC, id DESC`,
-    [adminDisplayName, city],
+    `SELECT * FROM training_sessions WHERE admin_display_name = $1 AND owner_email = $2 ORDER BY completed_at DESC, id DESC`,
+    [adminDisplayName, normalizedOwnerEmail],
   );
   return result.rows.map((row) => normalizeTrainingSession(row as DbRow));
 }
 
-export async function getTrainingSessionById(id: number, city?: string) {
-  const result = city
-    ? await getPool().query("SELECT * FROM training_sessions WHERE id = $1 AND city = $2 LIMIT 1", [id, city])
+export async function getTrainingSessionById(id: number, ownerEmail?: string) {
+  const result = ownerEmail
+    ? await getPool().query("SELECT * FROM training_sessions WHERE id = $1 AND owner_email = $2 LIMIT 1", [id, ownerEmail.trim().toLowerCase()])
     : await getPool().query("SELECT * FROM training_sessions WHERE id = $1 LIMIT 1", [id]);
 
   return (result.rowCount ?? 0) > 0 ? normalizeTrainingSession(result.rows[0] as DbRow) : null;
 }
 
-export async function deleteTrainingSessionsById(ids: number[], city: string) {
+export async function deleteTrainingSessionsById(ids: number[], ownerEmail: string) {
   if (!ids.length) return 0;
-  const result = await getPool().query("DELETE FROM training_sessions WHERE id = ANY($1::int[]) AND city = $2", [ids, city]);
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  const result = await getPool().query("DELETE FROM training_sessions WHERE id = ANY($1::int[]) AND owner_email = $2", [ids, normalizedOwnerEmail]);
   return Number(result.rowCount || 0);
 }
 
-export async function getSetting(key: string, city: string) {
-  const result = await getPool().query("SELECT value FROM settings WHERE key = $1 AND city = $2 LIMIT 1", [key, city]);
+export async function getSetting(key: string, ownerEmail: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
+  const result = await getPool().query("SELECT value FROM settings WHERE key = $1 AND owner_email = $2 LIMIT 1", [key, normalizedOwnerEmail]);
   return result.rows[0]?.value ? String(result.rows[0].value) : "";
 }
 
-export async function setSetting(key: string, value: string, city: string) {
+export async function setSetting(key: string, value: string, ownerEmail: string, city: string) {
+  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
   await getPool().query(
-    `INSERT INTO settings (key, value, city, updated_at) VALUES ($1, $2, $3, NOW())
-     ON CONFLICT (key, city) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
-    [key, value.trim(), city],
+    `INSERT INTO settings (key, value, city, owner_email, updated_at) VALUES ($1, $2, $3, $4, NOW())
+     ON CONFLICT (key, owner_email) DO UPDATE SET value = EXCLUDED.value, city = EXCLUDED.city, updated_at = NOW()`,
+    [key, value.trim(), city.trim(), normalizedOwnerEmail],
   );
-  return getSetting(key, city);
+  return getSetting(key, normalizedOwnerEmail);
 }
 
 export async function listManagerInvites() {

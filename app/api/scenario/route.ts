@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSessionFromCookie } from "@/lib/auth";
 import { buildScenario } from "@/lib/trainer-engine";
+import { getUserById } from "@/lib/db";
 import { getZodErrorMessage, scenarioRequestSchema } from "@/lib/validation";
 import { ZodError } from "zod";
 
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
   if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Только администратор может запускать тренировку." }, { status: 403 });
   }
+
+  const user = await getUserById(session.userId);
+  const ownerEmail = user?.managerEmail || session.managerEmail || session.email;
 
   try {
     let payload = {};
@@ -27,6 +31,7 @@ export async function POST(request: Request) {
 
     const scenario = await buildScenario({
       city: session.city || session.name,
+      ownerEmail,
       difficulty: body.difficulty || "medium",
       stepCount: body.stepCount,
     });

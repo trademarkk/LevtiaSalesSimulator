@@ -13,7 +13,9 @@ export const chatMessageSchema = z.object({
 export const scenarioContextSchema = z.object({
   objectionIds: z.array(z.number().int().positive()),
   city: z.string().optional(),
+  ownerEmail: z.string().optional(),
   persona: z.string(),
+  lessonDirection: z.string(),
   lessonImpression: z.string(),
   purchaseSignal: z.string(),
   difficulty: scenarioDifficultySchema,

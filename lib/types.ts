@@ -11,6 +11,7 @@ export type UserRecord = {
   role: UserRole;
   name: string;
   city?: string;
+  managerEmail?: string | null;
   status?: "active" | "disabled";
   createdAt: string;
 };
@@ -42,7 +43,9 @@ export type ObjectionRecord = {
 export type ScenarioContext = {
   objectionIds: number[];
   city?: string;
+  ownerEmail?: string;
   persona: string;
+  lessonDirection: string;
   lessonImpression: string;
   purchaseSignal: string;
   difficulty: ScenarioDifficulty;
@@ -81,6 +84,7 @@ export type SessionPayload = {
   email: string;
   name: string;
   city?: string;
+  managerEmail?: string | null;
   role: UserRole;
   exp: number;
 };

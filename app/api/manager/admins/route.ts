@@ -22,7 +22,7 @@ function parseSessionCookie(cookieHeader: string | null) {
 export async function GET(request: Request) {
   const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может видеть администраторов." }, { status: 403 });
-  return NextResponse.json({ admins: await listAdminAccounts(session.city || session.name) });
+  return NextResponse.json({ admins: await listAdminAccounts(session.email) });
 }
 
 export async function POST(request: Request) {
@@ -31,8 +31,8 @@ export async function POST(request: Request) {
   try {
     const body = createAdminSchema.parse(await request.json());
     const city = session.city || session.name;
-    const user = await createAdminUser({ city, name: body.name, email: body.email, password: body.password });
-    return NextResponse.json({ ok: true, user, admins: await listAdminAccounts(city) });
+    const user = await createAdminUser({ city, name: body.name, email: body.email, password: body.password, managerEmail: session.email });
+    return NextResponse.json({ ok: true, user, admins: await listAdminAccounts(session.email) });
   } catch (error) {
     const message = error instanceof ZodError ? getZodErrorMessage(error) : error instanceof Error ? error.message : "Не удалось создать администратора.";
     return NextResponse.json({ error: message }, { status: 400 });

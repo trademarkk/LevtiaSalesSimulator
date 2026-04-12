@@ -37,7 +37,7 @@ export default async function ManagerAdministratorTrainingsPage({ params }: Page
   const session = await requireSession("manager");
   const { adminName } = await params;
   const resolvedName = decodeName(adminName);
-  const sessions = await listTrainingSessionsByAdministrator(resolvedName, session.name);
+  const sessions = await listTrainingSessionsByAdministrator(resolvedName, session.email);
 
   if (!sessions.length) {
     notFound();

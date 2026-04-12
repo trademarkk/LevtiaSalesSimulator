@@ -11,7 +11,7 @@ const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
 
 export default async function ManagerTrainingsPage() {
   const session = await requireSession("manager");
-  const administrators = await listTrainingAdministrators(session.name);
+  const administrators = await listTrainingAdministrators(session.email);
   const totalSessions = administrators.reduce((sum: number, item: any) => sum + item.sessionCount, 0);
 
   return (

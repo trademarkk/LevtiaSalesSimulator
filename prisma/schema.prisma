@@ -37,11 +37,13 @@ model User {
   role         UserRole
   name         String
   city         String?
+  managerEmail String?      @map("manager_email")
   status       UserStatus   @default(active)
   createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
 
   trainingSessions TrainingSession[] @relation("AdminTrainingSessions")
 
+  @@index([managerEmail])
   @@map("users")
 }
 
@@ -58,47 +60,53 @@ model ManagerInvite {
 }
 
 model Objection {
-  id            Int       @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   title         String
-  objectionText String    @map("objection_text")
-  coachHint     String    @default("") @map("coach_hint")
-  stage         String    @default("general")
+  objectionText String     @map("objection_text")
+  coachHint     String     @default("") @map("coach_hint")
+  stage         String     @default("general")
   difficulty    Difficulty @default(medium)
-  isActive      Boolean   @default(true) @map("is_active")
-  isRequired    Boolean   @default(false) @map("is_required")
+  isActive      Boolean    @default(true) @map("is_active")
+  isRequired    Boolean    @default(false) @map("is_required")
   city          String?
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+  ownerEmail    String?    @map("owner_email")
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime   @default(now()) @map("updated_at") @db.Timestamp(6)
 
+  @@index([ownerEmail])
   @@map("objections")
 }
 
 model Setting {
-  key       String
-  city      String
-  value     String
-  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+  key        String
+  city       String
+  ownerEmail String   @map("owner_email")
+  value      String
+  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
-  @@id([key, city])
+  @@id([key, ownerEmail])
+  @@index([ownerEmail])
   @@map("settings")
 }
 
 model TrainingSession {
-  id                 Int        @id @default(autoincrement())
-  adminDisplayName   String     @map("admin_display_name")
-  adminUserId        Int?       @map("admin_user_id")
+  id                 Int         @id @default(autoincrement())
+  adminDisplayName   String      @map("admin_display_name")
+  adminUserId        Int?        @map("admin_user_id")
   city               String?
-  scenarioDifficulty Difficulty @map("scenario_difficulty")
-  stepCount          Int        @map("step_count")
+  ownerEmail         String?     @map("owner_email")
+  scenarioDifficulty Difficulty  @map("scenario_difficulty")
+  stepCount          Int         @map("step_count")
   trainerMode        TrainerMode @map("trainer_mode")
-  evaluationText     String     @map("evaluation_text")
+  evaluationText     String      @map("evaluation_text")
   score              Int?
-  transcriptJson     String     @map("transcript_json")
-  startedAt          String     @map("started_at")
-  completedAt        String     @map("completed_at")
-  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  transcriptJson     String      @map("transcript_json")
+  startedAt          String      @map("started_at")
+  completedAt        String      @map("completed_at")
+  createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
 
   adminUser User? @relation("AdminTrainingSessions", fields: [adminUserId], references: [id], onDelete: SetNull)
 
+  @@index([ownerEmail])
   @@map("training_sessions")
 }
