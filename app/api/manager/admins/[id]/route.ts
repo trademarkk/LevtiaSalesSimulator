@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
 import { getSessionFromCookie } from "@/lib/auth";
-import { deleteAdminAccount, listAdminAccounts, resetAdminPassword, setAdminStatus } from "@/lib/db";
+import { deleteAdminAccount, getUserById, listAdminAccounts, resetAdminPassword, setAdminStatus } from "@/lib/db";
 import { getZodErrorMessage } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -23,7 +23,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может управлять администраторами." }, { status: 403 });
   const params = await context.params;
   const id = Number(params.id);
-  const ownerEmail = session.email;
+  const user = await getUserById(session.userId);
+  const ownerEmail = user?.email || session.email;
   if (!Number.isFinite(id)) return NextResponse.json({ error: "Некорректный id администратора." }, { status: 400 });
   try {
     const body = patchSchema.parse(await request.json());
@@ -47,7 +48,8 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может удалять администраторов." }, { status: 403 });
   const params = await context.params;
   const id = Number(params.id);
-  const ownerEmail = session.email;
+  const user = await getUserById(session.userId);
+  const ownerEmail = user?.email || session.email;
   if (!Number.isFinite(id)) return NextResponse.json({ error: "Некорректный id администратора." }, { status: 400 });
   const admins = await deleteAdminAccount(id, ownerEmail);
   return NextResponse.json({ admins });
