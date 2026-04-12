@@ -132,22 +132,32 @@ function buildDefaultTrainerPrompt(city: string) {
     "- Твоя задача — реалистично проверить администратора на продаже абонемента после пробного занятия.",
     "",
     "[ОТЧЁТ ПОСЛЕ ДИАЛОГА — ШАБЛОН]",
+    "Правило тона отчёта:",
+    "- Это разбор навыков и следующий шаг, а не “приговор”.",
+    "- Всегда начинай со сильных сторон.",
+    "- Не используй уничижительные ярлыки (типа “плохо/ужасно/провал”). Описывай наблюдаемое поведение и его эффект.",
+    "",
     "🎯 Итог:",
     "- Решение: купила / отказалась (указать абонемент; напомнить, что абонемент действует во всех студиях города + онлайн-опция)",
     "- Причины: • … • … • …",
     "",
-    "🔢 Оценка администратора (0–10):",
-    "1) Выявление потребностей — X/2",
-    "2) Работа с возражениями — X/2",
-    "3) Аргументация выгоды — X/2",
-    "4) Удержание приоритета 144/96 (этика) — X/2",
-    "5) Перевод к шагу оплаты/брони — X/2",
-    "Итого: N/10",
+    "🧩 Карта навыков (без суммы и без баллов — это “снимок” именно этой ситуации):",
+    "Статусы:",
+    "- Уверенно — было конкретно, уместно и двигало к решению",
+    "- В развитии — были попытки, но не хватило глубины/конкретики/логики",
+    "- Следующий шаг — почти не проявилось или мешало прогрессу",
     "",
-    "🧠 Комментарий:",
-    "- Сильные стороны: • … • … • …",
-    "- Ошибки/упущения: • … • … • …",
-    "- Рекомендации (формулировки/приёмы): • … • … • … • …",
+    "1) Выявление потребностей — Уверенно / В развитии / Следующий шаг",
+    "2) Работа с возражениями — Уверенно / В развитии / Следующий шаг",
+    "3) Аргументация выгоды — Уверенно / В развитии / Следующий шаг",
+    "4) Удержание приоритета 144/96 (этика) — Уверенно / В развитии / Следующий шаг",
+    "5) Перевод к шагу оплаты/брони — Уверенно / В развитии / Следующий шаг",
+    "",
+    "🧠 Комментарий (максимально прикладной):",
+    "- Что уже получилось (минимум 2 пункта): • … • …",
+    "- Что усилить в следующий раз (1–3 пункта, как действия “спросить/уточнить/сказать/предложить”): • … • …",
+    "- Главный фокус следующей тренировки (одно действие, которое даст максимум эффекта): …",
+    "- Готовые формулировки (2–4 коротких варианта фраз, которые стоило сказать в этом диалоге): «…», «…», «…»",
     "- Фразы администратора, которые сработали: «…», «…», «…»",
     "",
     "🧍 Профиль клиента:",
@@ -337,6 +347,28 @@ export async function ensureAllManagersHaveDefaultObjections() {
     await ensureManagerData({ city, ownerEmail });
     const sync = await insertMissingObjectionsForOwner({ city, ownerEmail });
     summary.push({ ownerEmail, city, inserted: sync.inserted, skipped: sync.skipped });
+  }
+
+  return summary;
+}
+
+export async function overwriteAllManagersWithDefaultTrainerPrompt() {
+  const db = getPool();
+  const result = await db.query("SELECT DISTINCT email, city FROM users WHERE role = 'manager' AND email IS NOT NULL AND city IS NOT NULL AND TRIM(city) <> '' ORDER BY email ASC");
+  const summary: Array<{ ownerEmail: string; city: string }> = [];
+
+  for (const row of result.rows) {
+    const ownerEmail = String(row.email ?? "").trim().toLowerCase();
+    const city = String(row.city ?? "").trim();
+    if (!city || !ownerEmail) continue;
+
+    await db.query(
+      `INSERT INTO settings (key, value, city, owner_email, updated_at) VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT (key, owner_email) DO UPDATE SET value = EXCLUDED.value, city = EXCLUDED.city, updated_at = NOW()`,
+      ["trainer_prompt", buildDefaultTrainerPrompt(city), city, ownerEmail],
+    );
+
+    summary.push({ ownerEmail, city });
   }
 
   return summary;

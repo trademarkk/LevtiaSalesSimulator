@@ -901,6 +901,45 @@ textarea {
   color: var(--success);
 }
 
+.trainer-client-profile {
+  gap: 14px;
+  padding: 22px 24px;
+}
+
+.trainer-client-profile__header {
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.trainer-client-profile__title {
+  margin: 6px 0 0;
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+  line-height: 1.02;
+}
+
+.trainer-client-profile__grid {
+  gap: 12px;
+  align-items: start;
+}
+
+.trainer-client-profile__field {
+  gap: 6px;
+}
+
+.trainer-client-profile__label {
+  font-size: 0.9rem;
+  line-height: 1.3;
+  color: var(--accent-strong);
+}
+
+.trainer-client-profile__textarea {
+  min-height: 118px;
+  padding: 14px 16px;
+  line-height: 1.55;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
 @media (max-width: 1120px) {
   .hero,
   .login-hero,
@@ -935,6 +974,18 @@ textarea {
   .manager-filters,
   .master-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trainer-client-profile {
+    padding: 18px;
+  }
+
+  .trainer-client-profile__title {
+    margin-top: 4px;
+  }
+
+  .trainer-client-profile__textarea {
+    min-height: 96px;
   }
 }
 
@@ -1063,5 +1114,17 @@ textarea {
   select {
     padding: 12px 14px;
     border-radius: 16px;
+  }
+
+  .trainer-client-profile {
+    padding: 16px;
+  }
+
+  .trainer-client-profile__title {
+    font-size: 1.8rem;
+  }
+
+  .trainer-client-profile__label {
+    font-size: 0.86rem;
   }
 }

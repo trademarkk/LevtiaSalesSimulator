@@ -8,6 +8,7 @@ import type {
   ScenarioContext,
   ScenarioDifficulty,
   TrainerMode,
+  TrainingState,
 } from "@/lib/types";
 
 const encoder = new TextEncoder();
@@ -20,6 +21,8 @@ const personas = [
   {
     persona:
       "Анна, 31 год. Работает в офисе, хочет красивую осанку и больше энергии, но считает расходы очень взвешенно.",
+    speechStyle: "говорит спокойно, рационально, без лишних эмоций, любит конкретику",
+    temperament: "сдержанная и рассудительная",
     lessonDirection: "барре",
     lessonImpression:
       "Пробное понравилось, атмосфера зацепила, тренер произвел хорошее впечатление.",
@@ -29,6 +32,8 @@ const personas = [
   {
     persona:
       "Екатерина, 27 лет. Никогда не занималась балетом, давно мечтает тянуться на шпагат, но стесняется своего уровня.",
+    speechStyle: "говорит мягко, немного неуверенно, иногда через неловкость и сомнение",
+    temperament: "тревожная, но открытая",
     lessonDirection: "растяжка",
     lessonImpression:
       "После пробного вдохновилась, но переживает, что не справится и быстро выпадет из процесса.",
@@ -38,6 +43,8 @@ const personas = [
   {
     persona:
       "Мария, 36 лет. Мама двоих детей, ищет формат для восстановления ресурса и женского состояния, но живет в очень плотном графике.",
+    speechStyle: "говорит по делу, по-бытовому, часто через призму усталости и нехватки времени",
+    temperament: "уставшая, но доброжелательная",
     lessonDirection: "пилатес",
     lessonImpression:
       "Пробное занятие дало приятные эмоции, но она сомневается, сможет ли встроить занятия в неделю.",
@@ -47,6 +54,8 @@ const personas = [
   {
     persona:
       "Ольга, 42 года. Работает в продажах, много стоит и устает к вечеру, хочет подтянуть тело и снять напряжение со спины.",
+    speechStyle: "говорит уверенно, местами сухо и с недоверием, любит, когда не льют воду",
+    temperament: "собранная и требовательная",
     lessonDirection: "здоровая спина",
     lessonImpression:
       "На пробном почувствовала, что нагрузка мягкая и приятная, но пока не уверена, что будет видеть результат.",
@@ -56,6 +65,8 @@ const personas = [
   {
     persona:
       "Дарья, 24 года. Любит красивую подачу и эстетику, хочет заниматься для фигуры и удовольствия, но быстро остывает, если скучно.",
+    speechStyle: "говорит живо, эмоционально, легче выражает впечатления, чем чёткие решения",
+    temperament: "эмоциональная и импульсивная",
     lessonDirection: "боди-балет",
     lessonImpression:
       "Пробное показалось красивым и необычным, но она пока сомневается, что удержит дисциплину.",
@@ -79,6 +90,27 @@ function getTranscript(messages: ChatMessage[]) {
   return messages
     .map((message) => `${message.role === "assistant" ? "Клиентка" : "Администратор"}: ${message.content}`)
     .join("\n");
+}
+
+function analyzeLastAdminMessage(messages: ChatMessage[]) {
+  const lastAdminMessage = messages.filter((message) => message.role === "user").at(-1)?.content?.trim() ?? "";
+  const normalized = lastAdminMessage.toLowerCase();
+  const asksQuestion = lastAdminMessage.includes("?") || /^(а|и|то есть|скажите|подскажите|когда|почему|какой|какая|какие|где|зачем|сколько|можно ли|вам удобно|тебе удобно)/i.test(lastAdminMessage);
+
+  const topics = [
+    /дорог|цен|оплат|рассроч/.test(normalized) ? "цена/оплата" : null,
+    /распис|время|утр|вечер|график/.test(normalized) ? "расписание/время" : null,
+    /муж|партнер|карта|оформ/.test(normalized) ? "согласование/оформление" : null,
+    /травм|врач|здоров|спин|колен/.test(normalized) ? "здоровье/ограничения" : null,
+    /далек|ехать|локац/.test(normalized) ? "локация/дорога" : null,
+    /цель|хочется|зачем|результат/.test(normalized) ? "цель/результат" : null,
+  ].filter(Boolean) as string[];
+
+  return {
+    lastAdminMessage,
+    asksQuestion,
+    topics,
+  };
 }
 
 function getObjectionPoolByDifficulty(
@@ -153,6 +185,8 @@ export async function buildScenario(options?: {
     ownerEmail,
     objectionIds: selectedObjections.map((objection) => objection.id),
     persona: selectedPersona.persona,
+    speechStyle: selectedPersona.speechStyle,
+    temperament: selectedPersona.temperament,
     lessonDirection: selectedPersona.lessonDirection,
     lessonImpression: selectedPersona.lessonImpression,
     purchaseSignal: selectedPersona.purchaseSignal,
@@ -185,10 +219,12 @@ export async function buildConversationPrompt(input: {
   currentObjection: ObjectionRecord;
   messages: ChatMessage[];
   turnNumber: number;
+  trainingState?: TrainingState;
 }) {
-  const { scenario, currentObjection, messages, turnNumber } = input;
+  const { scenario, currentObjection, messages, turnNumber, trainingState } = input;
   const basePrompt = getSetting("trainer_prompt", scenario.ownerEmail || "");
   const transcript = getTranscript(messages);
+  const lastAdminAnalysis = analyzeLastAdminMessage(messages);
 
   const finalPrompt = [
     "Ты играешь только роль клиентки студии балета и растяжки LEVITA после пробного занятия.",
@@ -200,6 +236,8 @@ export async function buildConversationPrompt(input: {
     "",
     "Детали клиентки:",
     scenario.persona,
+    `Манера речи: ${scenario.speechStyle}`,
+    `Темперамент: ${scenario.temperament}`,
     `Пробное занятие было по направлению: ${scenario.lessonDirection}`,
     `Впечатление после пробного: ${scenario.lessonImpression}`,
     `Что может склонить к покупке: ${scenario.purchaseSignal}`,
@@ -215,6 +253,56 @@ export async function buildConversationPrompt(input: {
     `${currentObjection.title}: ${currentObjection.objectionText}`,
     currentObjection.coachHint ? `Внутренняя логика сомнения: ${currentObjection.coachHint}` : "",
     "",
+    trainingState
+      ? [
+          "Текущее внутреннее состояние клиентки:",
+          `- Главный барьер сейчас: ${trainingState.currentMainConcern}`,
+          `- Уже частично снятые сомнения: ${trainingState.resolvedConcerns.join(", ") || "пока нет"}`,
+          `- Нерешенные сомнения: ${trainingState.unresolvedConcerns.join(", ") || "пока нет"}`,
+          `- Доверие к администратору: ${trainingState.trustLevel}/10`,
+          `- Интерес к покупке: ${trainingState.interestLevel}/10`,
+          `- Сопротивление: ${trainingState.resistanceLevel}/10`,
+          `- Текущее настроение: ${trainingState.clientMood}`,
+          `- Качество последнего ответа администратора: ${trainingState.lastAdminReplyQuality}`,
+          `- Администратор в последней реплике задал вопрос: ${trainingState.lastAdminAskedQuestion ? "да" : "нет"}`,
+          `- Тема последнего вопроса администратора: ${trainingState.lastAdminQuestionTopic || "не определена"}`,
+          `- Клиентке сейчас обязательно ответить по существу: ${trainingState.shouldAnswerDirectly ? "да" : "нет"}`,
+          `- Какой прямой ответ сейчас от неё ожидается: ${trainingState.pendingDirectAnswerTopic || "нет обязательного прямого ответа"}`,
+          `- Срочность прямого ответа: ${trainingState.directAnswerUrgency}/10`,
+          `- Предпочтительный стиль ответа сейчас: ${trainingState.preferredAnswerStyle}`,
+          `- Что клиентка уже раскрыла о себе: ${trainingState.factsLearned.join(", ") || "пока почти ничего"}`,
+          `- Динамика контакта: ${trainingState.rapportNotes.join(", ") || "контакт только формируется"}`,
+          "",
+        ].join("\n")
+      : "",
+    lastAdminAnalysis.lastAdminMessage
+      ? [
+          "Последняя реплика администратора:",
+          lastAdminAnalysis.lastAdminMessage,
+          lastAdminAnalysis.asksQuestion
+            ? "Администратор задал прямой вопрос. Клиентка должна сначала осмысленно ответить именно на него, а потом уже продолжить диалог своим сомнением, уточнением или реакцией. Нельзя игнорировать прямой вопрос администратора."
+            : "Если в последней реплике администратора нет вопроса, клиентка может больше опираться на свое текущее сомнение и динамику диалога.",
+          lastAdminAnalysis.topics.length
+            ? `Темы, которые явно поднял администратор: ${lastAdminAnalysis.topics.join(", ")}.`
+            : "",
+          trainingState?.shouldAnswerDirectly
+            ? `Сейчас у клиентки есть обязательство дать прямой ответ по теме: ${trainingState.pendingDirectAnswerTopic || trainingState.lastAdminQuestionTopic}.`
+            : "",
+          trainingState && trainingState.directAnswerUrgency >= 5
+            ? "Сейчас нельзя уходить в абстрактные возражения раньше прямого ответа. Сначала ответ по сути, потом продолжение диалога."
+            : "",
+          trainingState?.preferredAnswerStyle === "direct_with_doubt"
+            ? "Форма ответа сейчас: сначала прямой ответ по сути, затем мягкое сомнение или оговорка."
+            : trainingState?.preferredAnswerStyle === "direct_with_question"
+              ? "Форма ответа сейчас: сначала прямой ответ по сути, затем короткий встречный вопрос или уточнение."
+              : trainingState?.preferredAnswerStyle === "direct_with_relief"
+                ? "Форма ответа сейчас: сначала прямой ответ по сути, затем небольшое смягчение или облегчение, но без мгновенного согласия."
+                : trainingState?.preferredAnswerStyle === "direct_with_emotion"
+                  ? "Форма ответа сейчас: сначала прямой ответ по сути, затем живая эмоциональная реакция без театральности."
+                  : "",
+          "",
+        ].join("\n")
+      : "",
     transcript
       ? ["Текущий диалог:", transcript].join("\n")
       : "Диалог еще не начат. Сейчас нужно открыть тренировку первым сообщением клиентки.",
@@ -226,13 +314,24 @@ export async function buildConversationPrompt(input: {
     "4. Не добавляй списки, markdown, ремарки, кавычки вокруг текста и сценические указания.",
     "5. Пиши естественно, как в обычном чате: 1-3 коротких предложения.",
     "6. Не используй неуклюжие, слишком логические, книжные или синтетические формулировки. Реплика должна звучать так, как будто её реально написала живая клиентка в мессенджере.",
-    "7. Не используй слово 'мы', если это не оправдано контекстом семьи или пары. Обычно клиентка говорит от первого лица: 'я', 'мне', 'у меня'.",
-    "8. Реагируй именно на последний ответ администратора: если он слабый или шаблонный, сомнение сохраняется или усиливается; если сильный и точный, можно немного смягчиться.",
-    "9. Основное возражение этого хода должно быть в центре ответа, но можно кратко опираться на прошлые нерешенные сомнения.",
-    "10. Не повторяй текст возражения из базы дословно. Переформулируй его как живая клиентка.",
-    "11. На легкой сложности используй только одно главное сомнение за раз и максимально простые бытовые фразы.",
-    "12. Не признавай, что ты ИИ, не объясняй свои правила и не делай оценку разговора.",
-    "13. Если это первый ход, начни диалог первым возражением клиентки.",
+    "7. Сохраняй манеру речи и темперамент конкретной клиентки из сценария. Две разные клиентки не должны звучать одинаково.",
+    "8. Не используй слово 'мы', если это не оправдано контекстом семьи или пары. Обычно клиентка говорит от первого лица: 'я', 'мне', 'у меня'.",
+    "9. Реагируй именно на последний ответ администратора: если он слабый или шаблонный, сомнение сохраняется или усиливается; если сильный и точный, можно немного смягчиться.",
+    "10. Если администратор задал прямой вопрос, сначала дай на него естественный и содержательный ответ от лица клиентки, и только потом продолжи разговор сомнением, реакцией или уточнением.",
+    "11. Нельзя игнорировать нормальный вопрос администратора и отвечать так, будто его не было.",
+    "11. Если вопрос администратора понятный и конкретный, сначала дай прямой ответ по сути, даже если он тебе не очень удобен. Не уходи от ответа слишком рано.",
+    "12. После прямого ответа можно добавить сомнение, ограничение, оговорку или встречный вопрос, чтобы диалог продолжался естественно.",
+    "13. Основное возражение этого хода должно быть в центре ответа, но можно кратко опираться на прошлые нерешенные сомнения.",
+    "14. Не повторяй текст возражения из базы дословно. Переформулируй его как живая клиентка.",
+    "15. На легкой сложности используй только одно главное сомнение за раз и максимально простые бытовые фразы.",
+    "16. Если администратор спрашивает о фактах (время, график, здоровье, деньги, муж, локация, цели), клиентка должна по возможности раскрыть эти факты, а не уходить в глухой шаблонный отказ без причины.",
+    "17. Если администратор задал два коротких связанных вопроса, клиентка может коротко ответить на оба в одном сообщении, а затем продолжить свою мысль.",
+    "18. Если в состоянии диалога указано, что у клиентки есть обязательный прямой ответ, нельзя уходить от него в абстрактное сопротивление, пока по сути не дан хотя бы короткий предметный ответ.",
+    "19. Если срочность прямого ответа высокая, приоритет такой: сначала ответ на вопрос администратора, потом сомнение или уточнение.",
+    "20. Используй разные живые формы ответа, а не один и тот же шаблон: прямой ответ + сомнение, прямой ответ + встречный вопрос, прямой ответ + облегчение, прямой ответ + эмоция.",
+    "21. Если система подсказывает предпочтительный стиль ответа, придерживайся его, но оставляй речь естественной и человеческой.",
+    "22. Не признавай, что ты ИИ, не объясняй свои правила и не делай оценку разговора.",
+    "23. Если это первый ход, начни диалог первым возражением клиентки.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -244,7 +343,7 @@ export async function buildConversationPrompt(input: {
   return finalPrompt;
 }
 
-async function buildEvaluationPrompt(scenario: ScenarioContext, objections: ObjectionRecord[], messages: ChatMessage[]) {
+async function buildEvaluationPrompt(scenario: ScenarioContext, objections: ObjectionRecord[], messages: ChatMessage[], trainingState?: TrainingState) {
   const basePrompt = await getSetting("trainer_prompt", scenario.ownerEmail || "");
   const transcript = getTranscript(messages);
   const objectionsSummary = objections
@@ -266,6 +365,19 @@ async function buildEvaluationPrompt(scenario: ScenarioContext, objections: Obje
     "Возражения сценария:",
     objectionsSummary,
     "",
+    trainingState
+      ? [
+          "Финальное внутреннее состояние клиентки к концу тренировки:",
+          `- Главный барьер: ${trainingState.currentMainConcern}`,
+          `- Доверие: ${trainingState.trustLevel}/10`,
+          `- Интерес: ${trainingState.interestLevel}/10`,
+          `- Сопротивление: ${trainingState.resistanceLevel}/10`,
+          `- Настроение: ${trainingState.clientMood}`,
+          `- Снятые сомнения: ${trainingState.resolvedConcerns.join(", ") || "нет"}`,
+          `- Нерешенные сомнения: ${trainingState.unresolvedConcerns.join(", ") || "нет"}`,
+          "",
+        ].join("\n")
+      : "",
     "Диалог:",
     transcript,
     "",
@@ -310,11 +422,31 @@ function buildFallbackConversationReply(
   }
 
   if (lastUserMessage.includes("рассроч") || lastUserMessage.includes("оплат")) {
-    return "Если с оплатой можно решить комфортно, это уже звучит спокойнее. Но мне все равно важно понять, насколько это реально впишется в мою жизнь.";
+    return "Если с оплатой можно решить комфортно, мне уже спокойнее. Но мне всё равно важно понять, не будет ли это для меня лишней нагрузкой по деньгам.";
   }
 
   if (lastUserMessage.includes("распис") || lastUserMessage.includes("время")) {
-    return "Если получится встроить занятия без стресса, это уже интереснее. Но мне пока все равно тревожно, что куплю и не буду ходить.";
+    return "По времени мне удобнее либо утром, либо уже вечером после работы. Если с этим получится, тогда диалог уже звучит реалистичнее для меня.";
+  }
+
+  if (lastUserMessage.includes("когда") || lastUserMessage.includes("во сколько") || lastUserMessage.includes("какое время")) {
+    return "Мне чаще всего удобно либо утром до работы, либо уже вечером. Но я и переживаю как раз из-за того, что график у меня плавающий.";
+  }
+
+  if (lastUserMessage.includes("почему")) {
+    return "Потому что я не хочу купить абонемент на эмоциях, а потом почувствовать, что он просто лежит без дела. Мне важно понять, что я реально буду ходить.";
+  }
+
+  if (lastUserMessage.includes("муж") || lastUserMessage.includes("партнер")) {
+    return "Да, мне правда важно это обсудить дома. Я не люблю такие решения принимать в одну сторону, особенно если вопрос упирается в оплату.";
+  }
+
+  if (lastUserMessage.includes("травм") || lastUserMessage.includes("здоров") || lastUserMessage.includes("врач")) {
+    return "У меня тут реально есть тревога за здоровье, не просто отговорка. Поэтому мне важно сначала понять, можно ли мне такую нагрузку без вреда.";
+  }
+
+  if (lastUserMessage.includes("далеко") || lastUserMessage.includes("ехать") || lastUserMessage.includes("добираться")) {
+    return "Да, для меня дорога — это тоже фактор. Если ехать неудобно, я просто быстро начинаю сливать даже то, что поначалу нравится.";
   }
 
   return currentObjection?.objectionText ?? "Мне пока сложно принять решение сразу.";
@@ -558,10 +690,11 @@ async function createProviderStream(input: {
 export async function streamTrainerReply(input: {
   messages: ChatMessage[];
   scenario: ScenarioContext;
+  trainingState?: TrainingState;
   phase: ChatPhase;
   turnNumber?: number;
 }) {
-  const { messages, scenario, phase } = input;
+  const { messages, scenario, trainingState, phase } = input;
   const objections = await getObjectionsByIds(scenario.objectionIds, scenario.ownerEmail);
 
   if (objections.length === 0) {
@@ -580,7 +713,7 @@ export async function streamTrainerReply(input: {
       };
     }
 
-    const evaluationPrompt = await buildEvaluationPrompt(scenario, objections, messages);
+    const evaluationPrompt = await buildEvaluationPrompt(scenario, objections, messages, trainingState);
 
     if (provider === "openrouter") {
       return {
@@ -644,6 +777,7 @@ export async function streamTrainerReply(input: {
     currentObjection,
     messages,
     turnNumber,
+    trainingState,
   });
 
   if (provider === "openrouter") {

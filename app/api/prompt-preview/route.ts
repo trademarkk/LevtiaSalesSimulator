@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       currentObjection,
       messages: body.messages,
       turnNumber,
+      trainingState: body.trainingState,
     });
 
     return NextResponse.json({ prompt });

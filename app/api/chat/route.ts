@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     const result = await streamTrainerReply({
       messages: body.messages,
       scenario: body.scenario,
+      trainingState: body.trainingState,
       phase: body.phase || "conversation",
       turnNumber: body.turnNumber,
     });

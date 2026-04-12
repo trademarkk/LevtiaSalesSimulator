@@ -10,11 +10,33 @@ export const chatMessageSchema = z.object({
   inputSource: z.enum(["text", "voice"]).optional(),
 });
 
+export const trainingStateSchema = z.object({
+  turnNumber: z.number().int().nonnegative(),
+  currentMainConcern: z.string(),
+  resolvedConcerns: z.array(z.string()),
+  unresolvedConcerns: z.array(z.string()),
+  trustLevel: z.number().int().min(0).max(10),
+  interestLevel: z.number().int().min(0).max(10),
+  resistanceLevel: z.number().int().min(0).max(10),
+  clientMood: z.string(),
+  lastAdminReplyQuality: z.enum(["weak", "medium", "strong"]),
+  lastAdminAskedQuestion: z.boolean(),
+  lastAdminQuestionTopic: z.string(),
+  shouldAnswerDirectly: z.boolean(),
+  pendingDirectAnswerTopic: z.string(),
+  directAnswerUrgency: z.number().int().min(0).max(10),
+  preferredAnswerStyle: z.enum(["direct_with_doubt", "direct_with_question", "direct_with_relief", "direct_with_emotion"]),
+  factsLearned: z.array(z.string()),
+  rapportNotes: z.array(z.string()),
+});
+
 export const scenarioContextSchema = z.object({
   objectionIds: z.array(z.number().int().positive()),
   city: z.string().optional(),
   ownerEmail: z.string().optional(),
   persona: z.string(),
+  speechStyle: z.string(),
+  temperament: z.string(),
   lessonDirection: z.string(),
   lessonImpression: z.string(),
   purchaseSignal: z.string(),
@@ -83,6 +105,7 @@ export const scenarioRequestSchema = z.object({
 export const chatRequestSchema = z.object({
   messages: z.array(chatMessageSchema).default([]),
   scenario: scenarioContextSchema,
+  trainingState: trainingStateSchema.optional(),
   phase: chatPhaseSchema.optional(),
   turnNumber: z.number().int().positive().optional(),
 });

@@ -40,11 +40,36 @@ export type ObjectionRecord = {
   updatedAt: string;
 };
 
+export type TrainingReplyQuality = "weak" | "medium" | "strong";
+export type ClientAnswerStyle = "direct_with_doubt" | "direct_with_question" | "direct_with_relief" | "direct_with_emotion";
+
+export type TrainingState = {
+  turnNumber: number;
+  currentMainConcern: string;
+  resolvedConcerns: string[];
+  unresolvedConcerns: string[];
+  trustLevel: number;
+  interestLevel: number;
+  resistanceLevel: number;
+  clientMood: string;
+  lastAdminReplyQuality: TrainingReplyQuality;
+  lastAdminAskedQuestion: boolean;
+  lastAdminQuestionTopic: string;
+  shouldAnswerDirectly: boolean;
+  pendingDirectAnswerTopic: string;
+  directAnswerUrgency: number;
+  preferredAnswerStyle: ClientAnswerStyle;
+  factsLearned: string[];
+  rapportNotes: string[];
+};
+
 export type ScenarioContext = {
   objectionIds: number[];
   city?: string;
   ownerEmail?: string;
   persona: string;
+  speechStyle: string;
+  temperament: string;
   lessonDirection: string;
   lessonImpression: string;
   purchaseSignal: string;
