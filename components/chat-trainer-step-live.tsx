@@ -108,12 +108,42 @@ function detectReplyQuality(message: string): TrainingReplyQuality {
   if (normalized.length > 180) score += 1;
   if (/(понимаю|слышу|согласна|согласен|важно|давайте посмотрим|подберем|подберём|удобно|комфортно)/.test(normalized)) score += 1;
   if (/(абонемент|расписан|время|оплат|рассроч|формат|результат|цель|задач)/.test(normalized)) score += 1;
-  if (/(давайте|предлагаю|можем|запишу|оформим|отправлю)/.test(normalized)) score += 1;
+  if (/(давайте|предлагаю|можем|запишу|оформим|отправлю|забронируем|закрепим)/.test(normalized)) score += 1;
   if (/(дорого|нет времени|не смогу|неудобно|муж|травм|боюсь)/.test(normalized)) score += 1;
+  if (/(что именно|что для вас|если правильно понимаю|верно понимаю|подскажите, что именно|какой из факторов)/.test(normalized)) score += 1;
 
-  if (score >= 4) return "strong";
-  if (score >= 2) return "medium";
+  if (score >= 5) return "strong";
+  if (score >= 3) return "medium";
   return "weak";
+}
+
+function detectBarrierResolution(message: string, currentConcern: string) {
+  const normalized = message.toLowerCase();
+  const concern = currentConcern.toLowerCase();
+
+  const hasEmpathy = /(понимаю|слышу|это нормально|это логично|вижу|важно)/.test(normalized);
+  const hasClarification = /(что именно|какой именно|верно понимаю|если правильно понимаю|что для вас важнее|подскажите)/.test(normalized);
+  const hasAction = /(давайте|можем|предлагаю|оформим|запишу|отправлю|подберем|подберём|закрепим|забронируем)/.test(normalized);
+  const hasSpecificity = /(144|96|48|24|рассроч|график|утром|вечером|онлайн|во всех студиях|студиях города|нагрузк|тренер)/.test(normalized);
+
+  const coversConcern =
+    (/цен|дорог|оплат|рассроч/.test(concern) && /(цен|оплат|рассроч|стоим|помесяч|месяц)/.test(normalized)) ||
+    (/время|распис|регуляр/.test(concern) && /(распис|время|утр|вечер|график|окно|удобно)/.test(normalized)) ||
+    (/здоров|травм|безопас/.test(concern) && /(здоров|травм|нагрузк|береж|адапт|безопас)/.test(normalized)) ||
+    (/муж|партнер|согласован/.test(concern) && /(муж|партнер|оформ|карта|обсуд|решени)/.test(normalized)) ||
+    (/локац|дорог/.test(concern) && /(локац|ехать|дорог|студ|район|онлайн)/.test(normalized)) ||
+    (/решени|последний аргумент|покупк/.test(concern) && /(оформ|запиш|брон|старт|начнем|начнём|сегодня|сейчас)/.test(normalized));
+
+  let score = 0;
+  if (hasEmpathy) score += 1;
+  if (hasClarification) score += 1;
+  if (hasAction) score += 1;
+  if (hasSpecificity) score += 1;
+  if (coversConcern) score += 2;
+
+  if (score >= 5) return "resolved" as const;
+  if (score >= 3) return "partial" as const;
+  return "unresolved" as const;
 }
 
 function buildInitialTrainingState(): TrainingState {
@@ -135,6 +165,15 @@ function buildInitialTrainingState(): TrainingState {
     preferredAnswerStyle: "direct_with_doubt",
     factsLearned: [],
     rapportNotes: ["контакт только начинается"],
+    activeObjectionId: null,
+    usedObjectionIds: [],
+    lastClientIntent: "проверяет безопасность решения и не готова покупать сразу",
+    trajectory: "neutral",
+    currentPhase: "opening",
+    closingSignalStrength: 0,
+    purchaseReadiness: 4,
+    refusalRisk: 4,
+    finalIntent: "undecided",
   };
 }
 
@@ -147,6 +186,8 @@ function updateTrainingState(previous: TrainingState | null, adminMessage: strin
   const unresolvedConcerns = [...prev.unresolvedConcerns];
   const factsLearned = [...prev.factsLearned];
   const rapportNotes = [...prev.rapportNotes];
+  const isClosingWindow = scenario.stepCount - nextTurnNumber <= 2;
+  const isLateDialog = nextTurnNumber >= Math.max(3, scenario.stepCount - 3);
 
   const extractedFacts = [
     /(работ|график|смен)/.test(normalized) ? "обсуждалась занятость и график" : null,
@@ -167,6 +208,10 @@ function updateTrainingState(previous: TrainingState | null, adminMessage: strin
   let clientMood = prev.clientMood;
   let currentMainConcern = prev.currentMainConcern;
   let lastAdminQuestionTopic = "";
+  let purchaseReadiness = prev.purchaseReadiness;
+  let refusalRisk = prev.refusalRisk;
+  let closingSignalStrength = prev.closingSignalStrength;
+  const barrierResolution = detectBarrierResolution(adminMessage, prev.currentMainConcern || scenario.purchaseSignal);
 
   if (/(дорог|цен|оплат|рассроч)/.test(normalized)) {
     lastAdminQuestionTopic = "цена и оплата";
@@ -186,19 +231,41 @@ function updateTrainingState(previous: TrainingState | null, adminMessage: strin
     trustLevel += 2;
     interestLevel += 1;
     resistanceLevel -= 2;
-    clientMood = "осторожная, но стала заметно теплее";
+    purchaseReadiness += isLateDialog ? 2 : 1;
+    refusalRisk -= 1;
+    closingSignalStrength += isLateDialog ? 2 : 1;
+    clientMood = isClosingWindow ? "почти готова принять решение, но хочет последний аргумент" : "осторожная, но стала заметно теплее";
     rapportNotes.push("администратор ответил уверенно и по делу");
   } else if (quality === "medium") {
     trustLevel += 1;
     resistanceLevel -= 1;
-    clientMood = "слушает, но всё ещё проверяет";
+    purchaseReadiness += isLateDialog ? 1 : 0;
+    closingSignalStrength += isLateDialog ? 1 : 0;
+    clientMood = isClosingWindow ? "колеблется, но решение уже близко" : "слушает, но всё ещё проверяет";
     rapportNotes.push("администратор держит контакт, но не везде добивает аргумент");
   } else {
     trustLevel -= 1;
     interestLevel -= 1;
     resistanceLevel += 1;
-    clientMood = "напряженная и не до конца убеждённая";
+    purchaseReadiness -= 1;
+    refusalRisk += isLateDialog ? 2 : 1;
+    if (isLateDialog) closingSignalStrength += 1;
+    clientMood = isClosingWindow ? "почти уходит в отказ и ищет повод не покупать" : "напряженная и не до конца убеждённая";
     rapportNotes.push("ответ ощущался общим или слабым");
+  }
+
+  if (barrierResolution === "resolved") {
+    trustLevel += 1;
+    resistanceLevel -= 1;
+    purchaseReadiness += 2;
+    refusalRisk -= 1;
+    rapportNotes.push("ключевой барьер был отработан предметно");
+  } else if (barrierResolution === "partial") {
+    purchaseReadiness += 1;
+    rapportNotes.push("барьер тронули, но не закрыли до конца");
+  } else {
+    refusalRisk += 1;
+    rapportNotes.push("главный барьер остался живым");
   }
 
   if (/(дорог|цен|оплат|рассроч)/.test(normalized)) {
@@ -211,15 +278,17 @@ function updateTrainingState(previous: TrainingState | null, adminMessage: strin
     currentMainConcern = "согласование оплаты и решения с партнером";
   } else if (/(далек|ехать|локац)/.test(normalized)) {
     currentMainConcern = "локация и дорога";
+  } else if (/(сегодня|сейчас|оформ|запиш|брон|оплат)/.test(normalized)) {
+    currentMainConcern = quality === "weak" ? "страх принять решение прямо сейчас" : "нужен последний аргумент перед решением";
   } else {
     currentMainConcern = prev.currentMainConcern || scenario.purchaseSignal;
   }
 
-  if (quality === "strong" && !resolvedConcerns.includes(currentMainConcern)) {
+  if (barrierResolution === "resolved" && !resolvedConcerns.includes(currentMainConcern)) {
     resolvedConcerns.push(currentMainConcern);
   }
 
-  if (quality !== "strong" && !unresolvedConcerns.includes(currentMainConcern)) {
+  if (barrierResolution !== "resolved" && !unresolvedConcerns.includes(currentMainConcern)) {
     unresolvedConcerns.push(currentMainConcern);
   }
 
@@ -237,6 +306,52 @@ function updateTrainingState(previous: TrainingState | null, adminMessage: strin
           ? "direct_with_question"
           : "direct_with_doubt"
     : prev.preferredAnswerStyle;
+
+  const currentPhase = isClosingWindow
+    ? "final-push"
+    : nextTurnNumber >= Math.max(3, scenario.stepCount - 5)
+      ? "closing"
+      : nextTurnNumber <= 2
+        ? "opening"
+        : nextTurnNumber <= Math.ceil(scenario.stepCount * 0.45)
+          ? "discovery"
+          : "objection_handling";
+
+  const trajectory = isLateDialog
+    ? purchaseReadiness >= 7 && refusalRisk <= 4 && trustLevel >= 6
+      ? "leaning_buy"
+      : refusalRisk >= 7 || resistanceLevel >= 7 || trustLevel <= 3
+        ? "leaning_refuse"
+        : "neutral"
+    : "neutral";
+
+  const finalIntent = isClosingWindow
+    ? trajectory === "leaning_buy"
+      ? purchaseReadiness >= 8 && refusalRisk <= 3
+        ? "buy_now"
+        : "buy_with_condition"
+      : trajectory === "leaning_refuse"
+        ? refusalRisk >= 8 || trustLevel <= 2
+          ? "hard_refusal"
+          : "soft_refusal"
+        : "undecided"
+    : "undecided";
+
+  const lastClientIntent = finalIntent === "buy_now"
+    ? "готова покупать почти сразу, если не появится новый риск"
+    : finalIntent === "buy_with_condition"
+      ? "почти готова купить, но хочет последнее условие или подтверждение"
+      : finalIntent === "soft_refusal"
+        ? "хочет мягко отказаться или отложить решение"
+        : finalIntent === "hard_refusal"
+          ? "почти закрыла для себя покупку и уходит в отказ"
+          : trajectory === "leaning_buy"
+            ? "ищет последнее подтверждение и мысленно приближается к покупке"
+            : trajectory === "leaning_refuse"
+              ? "ищет аккуратный способ отказаться и закрыть разговор"
+              : asksQuestion
+                ? "готова ответить по сути, но всё ещё сомневается"
+                : "проверяет администратора и не торопится с решением";
 
   return {
     turnNumber: nextTurnNumber,
@@ -256,6 +371,15 @@ function updateTrainingState(previous: TrainingState | null, adminMessage: strin
     preferredAnswerStyle,
     factsLearned: [...new Set(factsLearned)].slice(-8),
     rapportNotes: [...new Set(rapportNotes)].slice(-6),
+    activeObjectionId: prev.activeObjectionId ?? null,
+    usedObjectionIds: [...new Set(prev.usedObjectionIds)].slice(-20),
+    lastClientIntent,
+    trajectory,
+    currentPhase,
+    closingSignalStrength: clampLevel(closingSignalStrength),
+    purchaseReadiness: clampLevel(purchaseReadiness),
+    refusalRisk: clampLevel(refusalRisk),
+    finalIntent,
   };
 }
 
@@ -453,8 +577,9 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
 
   async function requestClientTurn(baseMessages: ChatMessage[], activeScenario: ScenarioContext, activeTrainingState: TrainingState | null, turnNumber: number) {
     setMessages([...baseMessages, { role: "assistant", content: "" }]);
+    const nextState = activeTrainingState ? { ...activeTrainingState } : activeTrainingState;
     try {
-      const clientReply = await streamText({ messages: baseMessages, scenario: activeScenario, trainingState: activeTrainingState, phase: "conversation", turnNumber, onUpdate: (text) => setMessages([...baseMessages, { role: "assistant", content: text }]) });
+      const clientReply = await streamText({ messages: baseMessages, scenario: activeScenario, trainingState: nextState, phase: "conversation", turnNumber, onUpdate: (text) => setMessages([...baseMessages, { role: "assistant", content: text }]) });
       setMessages([...baseMessages, { role: "assistant", content: clientReply }]);
     } catch (replyError) {
       setMessages(baseMessages);
@@ -488,7 +613,10 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
       const scenarioPayload = (await scenarioResponse.json()) as { scenario?: ScenarioContext; error?: string };
       if (!scenarioResponse.ok || !scenarioPayload.scenario) throw new Error(scenarioPayload.error || "Не удалось собрать сценарий.");
       const nextStartedAt = new Date().toISOString();
-      const initialTrainingState = buildInitialTrainingState();
+      const initialTrainingState = {
+        ...buildInitialTrainingState(),
+        activeObjectionId: scenarioPayload.scenario.objectionIds[0] ?? null,
+      };
       setTrainingState(initialTrainingState);
       setScenario(scenarioPayload.scenario); setMessages([]); setTrainingStartedAt(nextStartedAt); await requestClientTurn([], scenarioPayload.scenario, initialTrainingState, 1);
     } catch (scenarioError) {
@@ -506,7 +634,19 @@ export function ChatTrainerStepLive({ userName, adminDisplayName }: ChatTrainerS
     const nextAdminReplyCount = countAdminReplies(nextMessages);
     setMessages(nextMessages); setInput(""); setInputSource("text"); setLoading(true); setError("");
     try {
-      const nextTrainingState = updateTrainingState(trainingState, adminMessage.content, scenario, nextAdminReplyCount + 1);
+      const nextTrainingStateBase = updateTrainingState(trainingState, adminMessage.content, scenario, nextAdminReplyCount + 1);
+      const usedObjectionIds = trainingState?.activeObjectionId
+        ? [...new Set([...(nextTrainingStateBase.usedObjectionIds || []), trainingState.activeObjectionId])]
+        : [...new Set(nextTrainingStateBase.usedObjectionIds || [])];
+
+      const nextTrainingState = {
+        ...nextTrainingStateBase,
+        usedObjectionIds,
+        activeObjectionId: nextAdminReplyCount >= scenario.stepCount
+          ? nextTrainingStateBase.activeObjectionId ?? trainingState?.activeObjectionId ?? null
+          : trainingState?.activeObjectionId ?? nextTrainingStateBase.activeObjectionId ?? null,
+      };
+
       setTrainingState(nextTrainingState);
 
       if (nextAdminReplyCount >= scenario.stepCount) {

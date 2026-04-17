@@ -42,6 +42,9 @@ export type ObjectionRecord = {
 
 export type TrainingReplyQuality = "weak" | "medium" | "strong";
 export type ClientAnswerStyle = "direct_with_doubt" | "direct_with_question" | "direct_with_relief" | "direct_with_emotion";
+export type TrainingTrajectory = "neutral" | "leaning_buy" | "leaning_refuse";
+export type TrainingPhase = "opening" | "discovery" | "objection_handling" | "closing" | "final-push";
+export type TrainingFinalIntent = "undecided" | "buy_now" | "buy_with_condition" | "soft_refusal" | "hard_refusal";
 
 export type TrainingState = {
   turnNumber: number;
@@ -61,6 +64,15 @@ export type TrainingState = {
   preferredAnswerStyle: ClientAnswerStyle;
   factsLearned: string[];
   rapportNotes: string[];
+  activeObjectionId?: number | null;
+  usedObjectionIds: number[];
+  lastClientIntent: string;
+  trajectory: TrainingTrajectory;
+  currentPhase: TrainingPhase;
+  closingSignalStrength: number;
+  purchaseReadiness: number;
+  refusalRisk: number;
+  finalIntent: TrainingFinalIntent;
 };
 
 export type ScenarioContext = {

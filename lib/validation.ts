@@ -28,6 +28,15 @@ export const trainingStateSchema = z.object({
   preferredAnswerStyle: z.enum(["direct_with_doubt", "direct_with_question", "direct_with_relief", "direct_with_emotion"]),
   factsLearned: z.array(z.string()),
   rapportNotes: z.array(z.string()),
+  activeObjectionId: z.number().int().positive().nullable().optional(),
+  usedObjectionIds: z.array(z.number().int().positive()),
+  lastClientIntent: z.string(),
+  trajectory: z.enum(["neutral", "leaning_buy", "leaning_refuse"]),
+  currentPhase: z.enum(["opening", "discovery", "objection_handling", "closing", "final-push"]),
+  closingSignalStrength: z.number().int().min(0).max(10),
+  purchaseReadiness: z.number().int().min(0).max(10),
+  refusalRisk: z.number().int().min(0).max(10),
+  finalIntent: z.enum(["undecided", "buy_now", "buy_with_condition", "soft_refusal", "hard_refusal"]),
 });
 
 export const scenarioContextSchema = z.object({

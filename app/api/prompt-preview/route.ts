@@ -3,7 +3,7 @@ import { ZodError } from "zod";
 
 import { getSessionFromCookie } from "@/lib/auth";
 import { getObjectionsByIds, getUserById } from "@/lib/db";
-import { buildConversationPrompt } from "@/lib/trainer-engine";
+import { buildConversationPrompt, resolveCurrentObjection } from "@/lib/trainer-engine";
 import { chatRequestSchema, getZodErrorMessage } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -22,7 +22,12 @@ export async function POST(request: Request) {
     const body = chatRequestSchema.parse(await request.json());
     const turnNumber = body.turnNumber || 1;
     const objections = await getObjectionsByIds(body.scenario.objectionIds, ownerEmail || body.scenario.ownerEmail);
-    const currentObjection = objections[Math.min(turnNumber - 1, objections.length - 1)];
+    const currentObjection = resolveCurrentObjection({
+      objections,
+      trainingState: body.trainingState,
+      turnNumber,
+      stepCount: body.scenario.stepCount,
+    });
 
     if (!currentObjection) {
       return NextResponse.json({ error: "Не удалось определить текущее возражение для preview." }, { status: 400 });
