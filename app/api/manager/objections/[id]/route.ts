@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { deleteObjection, setObjectionActive, setObjectionRequired, updateObjection } from "@/lib/db";
 import { getZodErrorMessage, managerObjectionToggleSchema, managerObjectionUpdateSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
-
-function parseSessionCookie(cookieHeader: string | null) {
-  if (!cookieHeader) return null;
-  const match = cookieHeader.match(/levita_session=([^;]+)/);
-  return match?.[1] ?? null;
-}
 
 async function getValidatedId(context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
@@ -20,7 +14,7 @@ async function getValidatedId(context: { params: Promise<{ id: string }> }) {
 }
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может менять шаблоны." }, { status: 403 });
   const objectionId = await getValidatedId(context);
   if (!objectionId) return NextResponse.json({ error: "Некорректный идентификатор шаблона." }, { status: 400 });
@@ -41,7 +35,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 }
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может редактировать шаблоны." }, { status: 403 });
   const objectionId = await getValidatedId(context);
   if (!objectionId) return NextResponse.json({ error: "Некорректный идентификатор шаблона." }, { status: 400 });
@@ -57,7 +51,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 }
 
 export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может удалять шаблоны." }, { status: 403 });
   const objectionId = await getValidatedId(context);
   if (!objectionId) return NextResponse.json({ error: "Некорректный идентификатор шаблона." }, { status: 400 });

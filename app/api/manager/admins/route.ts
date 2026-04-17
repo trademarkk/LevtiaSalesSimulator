@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError, z } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { createAdminUser, getUserById, listAdminAccounts } from "@/lib/db";
 import { getZodErrorMessage } from "@/lib/validation";
 
@@ -13,14 +13,8 @@ const createAdminSchema = z.object({
   password: z.string().min(6),
 });
 
-function parseSessionCookie(cookieHeader: string | null) {
-  if (!cookieHeader) return null;
-  const match = cookieHeader.match(/levita_session=([^;]+)/);
-  return match?.[1] ?? null;
-}
-
 export async function GET(request: Request) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может видеть администраторов." }, { status: 403 });
   const user = await getUserById(session.userId);
   const ownerEmail = user?.email || session.email;
@@ -28,7 +22,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может создавать администраторов." }, { status: 403 });
   const user = await getUserById(session.userId);
   const ownerEmail = user?.email || session.email;

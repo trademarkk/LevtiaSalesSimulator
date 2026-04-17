@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { createTrainingSession, deleteTrainingSessionsById, getUserById } from "@/lib/db";
 import { getZodErrorMessage, trainingSessionCreateSchema, trainingSessionDeleteSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
-function parseSessionCookie(cookieHeader: string | null) {
-  if (!cookieHeader) return null;
-  const match = cookieHeader.match(/levita_session=([^;]+)/);
-  return match?.[1] ?? null;
-}
-
 export async function POST(request: Request) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "admin");
   if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Только администратор может сохранять тренировку." }, { status: 403 });
   }
@@ -43,7 +37,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") {
     return NextResponse.json({ error: "Только руководитель может удалять сессии тренировок." }, { status: 403 });
   }

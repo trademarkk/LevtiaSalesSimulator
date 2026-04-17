@@ -1,7 +1,41 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
-import { Pool } from "pg";
-
+export {
+  createManagerInvite,
+  listManagerInvites,
+} from "@/lib/db-invites";
+export {
+  createObjection,
+  deleteObjection,
+  getObjectionsByIds,
+  listActiveObjections,
+  listObjections,
+  setObjectionActive,
+  setObjectionRequired,
+  updateObjection,
+} from "@/lib/db-objections";
+export {
+  getSetting,
+  setSetting,
+} from "@/lib/db-settings";
+export {
+  deleteAdminAccount,
+  getUserByEmail,
+  getUserById,
+  listAdminAccounts,
+  listManagerAccounts,
+  resetAdminPassword,
+  setAdminStatus,
+  setManagerStatus,
+} from "@/lib/db-users";
+export {
+  createTrainingSession,
+  deleteTrainingSessionsById,
+  getTrainingSessionById,
+  listTrainingAdministrators,
+  listTrainingSessionsByAdministrator,
+} from "@/lib/db-training-sessions";
+import { getUserByEmail } from "@/lib/db-users";
 import type {
   ChatMessage,
   ObjectionRecord,
@@ -12,24 +46,7 @@ import type {
   UserRecord,
 } from "@/lib/types";
 
-let pool: Pool | null = null;
-
-function getPool() {
-  if (!pool) {
-    if (!process.env.DATABASE_URL) {
-      throw new Error("DATABASE_URL не задан.");
-    }
-
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-    });
-  }
-
-  return pool;
-}
-
-type DbRow = Record<string, unknown>;
+import { getPool, type DbRow } from "@/lib/db-core";
 
 type ObjectionSeed = {
   title: string;
@@ -378,14 +395,6 @@ async function getOne<T>(query: string, values: unknown[] = [], normalizer?: (ro
   return normalizer ? normalizer(result.rows[0] as DbRow) : (result.rows[0] as T);
 }
 
-export async function getUserByEmail(email: string) {
-  return getOne("SELECT * FROM users WHERE email = $1 LIMIT 1", [email], normalizeUser);
-}
-
-export async function getUserById(id: number) {
-  return getOne("SELECT * FROM users WHERE id = $1 LIMIT 1", [id], normalizeUser);
-}
-
 export async function createAdminUser(input: { city: string; email: string; password: string; name?: string; managerEmail?: string }) {
   const normalizedEmail = input.email.trim().toLowerCase();
   const normalizedCity = input.city.trim();
@@ -402,46 +411,6 @@ export async function createAdminUser(input: { city: string; email: string; pass
 
   await ensureManagerData({ city: normalizedCity, ownerEmail: normalizedManagerEmail });
   return getUserByEmail(normalizedEmail);
-}
-
-export async function createManagerInvite(input: { city: string; email?: string }) {
-  const city = input.city.trim();
-  if (!city) throw new Error("Укажите город для инвайта.");
-  const code = randomBytes(6).toString("hex").toUpperCase();
-  await getPool().query("INSERT INTO manager_invites (code, city, email) VALUES ($1, $2, $3)", [code, city, input.email?.trim().toLowerCase() || null]);
-  return { code, city, email: input.email?.trim().toLowerCase() || null };
-}
-
-export async function listAdminAccounts(ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query(
-    `SELECT u.id, u.name, u.email, u.city, u.status, u.created_at, COUNT(ts.id) AS training_count, MAX(ts.completed_at) AS last_training_at
-     FROM users u
-     LEFT JOIN training_sessions ts ON ts.admin_user_id = u.id AND ts.owner_email = $1
-     WHERE u.role = 'admin' AND u.manager_email = $1
-     GROUP BY u.id, u.name, u.email, u.city, u.status, u.created_at
-     ORDER BY u.created_at DESC`,
-    [normalizedOwnerEmail],
-  );
-  return result.rows as Array<Record<string, unknown>>;
-}
-
-export async function setAdminStatus(id: number, ownerEmail: string, status: "active" | "disabled") {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query("UPDATE users SET status = $1 WHERE id = $2 AND manager_email = $3 AND role = 'admin'", [status, id, normalizedOwnerEmail]);
-  return listAdminAccounts(normalizedOwnerEmail);
-}
-
-export async function resetAdminPassword(id: number, ownerEmail: string, password: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query("UPDATE users SET password_hash = $1 WHERE id = $2 AND manager_email = $3 AND role = 'admin'", [hashPassword(password), id, normalizedOwnerEmail]);
-  return true;
-}
-
-export async function deleteAdminAccount(id: number, ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query("DELETE FROM users WHERE id = $1 AND manager_email = $2 AND role = 'admin'", [id, normalizedOwnerEmail]);
-  return listAdminAccounts(normalizedOwnerEmail);
 }
 
 export async function createManagerUserFromInvite(input: { code: string; city: string; email: string; password: string }) {
@@ -464,168 +433,4 @@ export async function createManagerUserFromInvite(input: { code: string; city: s
   return getUserByEmail(normalizedEmail);
 }
 
-export async function listObjections(ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query("SELECT * FROM objections WHERE owner_email = $1 ORDER BY is_required DESC, is_active DESC, updated_at DESC, id DESC", [normalizedOwnerEmail]);
-  return result.rows.map((row) => normalizeObjection(row as DbRow));
-}
 
-export async function listActiveObjections(ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query("SELECT * FROM objections WHERE is_active = TRUE AND owner_email = $1 ORDER BY is_required DESC, id DESC", [normalizedOwnerEmail]);
-  return result.rows.map((row) => normalizeObjection(row as DbRow));
-}
-
-export async function getObjectionsByIds(ids: number[], ownerEmail?: string) {
-  if (!ids.length) return [];
-  const values: unknown[] = [ids];
-  let query = "SELECT * FROM objections WHERE id = ANY($1::int[])";
-  if (ownerEmail) {
-    values.push(ownerEmail.trim().toLowerCase());
-    query += " AND owner_email = $2";
-  }
-  query += " ORDER BY id ASC";
-  const result = await getPool().query(query, values);
-  const normalizedRows = result.rows.map((row) => normalizeObjection(row as DbRow));
-  const rowsById = new Map(normalizedRows.map((row) => [row.id, row]));
-  return ids.map((id) => rowsById.get(id)).filter((row): row is ObjectionRecord => Boolean(row));
-}
-
-export async function createObjection(input: { title: string; objectionText: string; coachHint: string; stage: string; difficulty: "easy" | "medium" | "hard"; isActive: boolean; isRequired: boolean; city: string; ownerEmail: string; }) {
-  const city = input.city.trim();
-  const ownerEmail = input.ownerEmail.trim().toLowerCase();
-  await getPool().query(
-    `INSERT INTO objections (title, objection_text, coach_hint, stage, difficulty, is_active, is_required, city, owner_email, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())`,
-    [input.title.trim(), input.objectionText.trim(), input.coachHint.trim(), input.stage.trim(), input.difficulty, input.isActive, input.isRequired, city, ownerEmail],
-  );
-  return listObjections(ownerEmail);
-}
-
-export async function updateObjection(id: number, input: { title: string; objectionText: string; coachHint: string; stage: string; difficulty: "easy" | "medium" | "hard"; isActive: boolean; isRequired: boolean; city: string; ownerEmail: string; }) {
-  const city = input.city.trim();
-  const ownerEmail = input.ownerEmail.trim().toLowerCase();
-  await getPool().query(
-    `UPDATE objections SET title = $1, objection_text = $2, coach_hint = $3, stage = $4, difficulty = $5, is_active = $6, is_required = $7, city = $8, updated_at = NOW()
-     WHERE id = $9 AND owner_email = $10`,
-    [input.title.trim(), input.objectionText.trim(), input.coachHint.trim(), input.stage.trim(), input.difficulty, input.isActive, input.isRequired, city, id, ownerEmail],
-  );
-  return listObjections(ownerEmail);
-}
-
-export async function setObjectionActive(id: number, isActive: boolean, ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query("UPDATE objections SET is_active = $1, updated_at = NOW() WHERE id = $2 AND owner_email = $3", [isActive, id, normalizedOwnerEmail]);
-  return listObjections(normalizedOwnerEmail);
-}
-
-export async function setObjectionRequired(id: number, isRequired: boolean, ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query("UPDATE objections SET is_required = $1, updated_at = NOW() WHERE id = $2 AND owner_email = $3", [isRequired, id, normalizedOwnerEmail]);
-  return listObjections(normalizedOwnerEmail);
-}
-
-export async function deleteObjection(id: number, ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query("DELETE FROM objections WHERE id = $1 AND owner_email = $2", [id, normalizedOwnerEmail]);
-  return listObjections(normalizedOwnerEmail);
-}
-
-export async function createTrainingSession(input: { adminDisplayName: string; adminUserId?: number | null; city: string; ownerEmail: string; scenario: ScenarioContext; trainerMode: TrainerMode; evaluationText: string; transcript: ChatMessage[]; startedAt: string; completedAt?: string; }) {
-  const completedAt = input.completedAt || new Date().toISOString();
-  const ownerEmail = input.ownerEmail.trim().toLowerCase();
-  await getPool().query(
-    `INSERT INTO training_sessions (admin_display_name, admin_user_id, city, owner_email, scenario_difficulty, step_count, trainer_mode, evaluation_text, score, transcript_json, started_at, completed_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-    [input.adminDisplayName.trim(), input.adminUserId ?? null, input.city.trim(), ownerEmail, input.scenario.difficulty, input.scenario.stepCount, input.trainerMode, input.evaluationText.trim(), extractTrainingScore(input.evaluationText), JSON.stringify(input.transcript), input.startedAt, completedAt],
-  );
-}
-
-export async function listTrainingAdministrators(ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query(
-    `SELECT admin_display_name, COUNT(*) AS session_count, AVG(score) AS average_score, MAX(completed_at) AS last_completed_at
-     FROM training_sessions
-     WHERE owner_email = $1
-     GROUP BY admin_display_name
-     ORDER BY last_completed_at DESC, admin_display_name ASC`,
-    [normalizedOwnerEmail],
-  );
-
-  return result.rows.map((row) => ({
-    adminDisplayName: String(row.admin_display_name),
-    sessionCount: Number(row.session_count),
-    averageScore: row.average_score == null ? null : Math.round(Number(row.average_score) * 10) / 10,
-    lastCompletedAt: String(row.last_completed_at),
-  })) satisfies TrainingAdministratorSummary[];
-}
-
-export async function listTrainingSessionsByAdministrator(adminDisplayName: string, ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query(
-    `SELECT * FROM training_sessions WHERE admin_display_name = $1 AND owner_email = $2 ORDER BY completed_at DESC, id DESC`,
-    [adminDisplayName, normalizedOwnerEmail],
-  );
-  return result.rows.map((row) => normalizeTrainingSession(row as DbRow));
-}
-
-export async function getTrainingSessionById(id: number, ownerEmail?: string) {
-  const result = ownerEmail
-    ? await getPool().query("SELECT * FROM training_sessions WHERE id = $1 AND owner_email = $2 LIMIT 1", [id, ownerEmail.trim().toLowerCase()])
-    : await getPool().query("SELECT * FROM training_sessions WHERE id = $1 LIMIT 1", [id]);
-
-  return (result.rowCount ?? 0) > 0 ? normalizeTrainingSession(result.rows[0] as DbRow) : null;
-}
-
-export async function deleteTrainingSessionsById(ids: number[], ownerEmail: string) {
-  if (!ids.length) return 0;
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query("DELETE FROM training_sessions WHERE id = ANY($1::int[]) AND owner_email = $2", [ids, normalizedOwnerEmail]);
-  return Number(result.rowCount || 0);
-}
-
-export async function getSetting(key: string, ownerEmail: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  const result = await getPool().query("SELECT value FROM settings WHERE key = $1 AND owner_email = $2 LIMIT 1", [key, normalizedOwnerEmail]);
-  return result.rows[0]?.value ? String(result.rows[0].value) : "";
-}
-
-export async function setSetting(key: string, value: string, ownerEmail: string, city: string) {
-  const normalizedOwnerEmail = ownerEmail.trim().toLowerCase();
-  await getPool().query(
-    `INSERT INTO settings (key, value, city, owner_email, updated_at) VALUES ($1, $2, $3, $4, NOW())
-     ON CONFLICT (key, owner_email) DO UPDATE SET value = EXCLUDED.value, city = EXCLUDED.city, updated_at = NOW()`,
-    [key, value.trim(), city.trim(), normalizedOwnerEmail],
-  );
-  return getSetting(key, normalizedOwnerEmail);
-}
-
-export async function listManagerInvites() {
-  const result = await getPool().query(`SELECT id, code, city, email, is_used, created_at, used_at FROM manager_invites ORDER BY created_at DESC, id DESC`);
-  return result.rows.map((row) => ({
-    id: Number(row.id),
-    code: String(row.code),
-    city: String(row.city),
-    email: row.email ? String(row.email) : null,
-    isUsed: Boolean(row.is_used),
-    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
-    usedAt: row.used_at ? (row.used_at instanceof Date ? row.used_at.toISOString() : String(row.used_at)) : null,
-  }));
-}
-
-export async function listManagerAccounts() {
-  const result = await getPool().query(`SELECT id, name, email, city, status, created_at FROM users WHERE role = 'manager' ORDER BY created_at DESC, id DESC`);
-  return result.rows.map((row) => ({
-    id: Number(row.id),
-    name: String(row.name),
-    email: String(row.email),
-    city: String(row.city ?? row.name ?? ''),
-    status: String(row.status ?? 'active') as 'active' | 'disabled',
-    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
-  }));
-}
-
-export async function setManagerStatus(id: number, status: 'active' | 'disabled') {
-  await getPool().query("UPDATE users SET status = $1 WHERE id = $2 AND role = 'manager'", [status, id]);
-  return listManagerAccounts();
-}

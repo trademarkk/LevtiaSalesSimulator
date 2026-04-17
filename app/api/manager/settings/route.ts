@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { getSetting, setSetting } from "@/lib/db";
 import { getZodErrorMessage, managerSettingsSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
-function parseSessionCookie(cookieHeader: string | null) {
-  if (!cookieHeader) {
-    return null;
-  }
-
-  const match = cookieHeader.match(/levita_session=([^;]+)/);
-  return match?.[1] ?? null;
-}
-
 export async function GET(request: Request) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
 
   if (!session || session.role !== "manager") {
     return NextResponse.json({ error: "Только руководитель может видеть настройки." }, { status: 403 });
@@ -27,7 +18,7 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
 
   if (!session || session.role !== "manager") {
     return NextResponse.json({ error: "Только руководитель может редактировать промпт." }, { status: 403 });

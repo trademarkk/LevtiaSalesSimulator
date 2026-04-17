@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { setManagerStatus } from "@/lib/db";
 import { getZodErrorMessage } from "@/lib/validation";
 
@@ -11,14 +11,8 @@ const patchSchema = z.object({
   status: z.enum(["active", "disabled"]),
 });
 
-function parseSessionCookie(cookieHeader: string | null) {
-  if (!cookieHeader) return null;
-  const match = cookieHeader.match(/levita_session=([^;]+)/);
-  return match?.[1] ?? null;
-}
-
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "master");
   if (!session || session.role !== "master") return NextResponse.json({ error: "Только master может управлять руководителями." }, { status: 403 });
   const params = await context.params;
   const id = Number(params.id);

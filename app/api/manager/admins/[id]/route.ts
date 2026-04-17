@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { deleteAdminAccount, getUserById, listAdminAccounts, resetAdminPassword, setAdminStatus } from "@/lib/db";
 import { getZodErrorMessage } from "@/lib/validation";
 
@@ -12,14 +12,8 @@ const patchSchema = z.object({
   resetPassword: z.string().min(6).optional(),
 });
 
-function parseSessionCookie(cookieHeader: string | null) {
-  if (!cookieHeader) return null;
-  const match = cookieHeader.match(/levita_session=([^;]+)/);
-  return match?.[1] ?? null;
-}
-
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может управлять администраторами." }, { status: 403 });
   const params = await context.params;
   const id = Number(params.id);
@@ -44,7 +38,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 }
 
 export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
-  const session = getSessionFromCookie(parseSessionCookie(request.headers.get("cookie")));
+  const session = requireApiSession(request, "manager");
   if (!session || session.role !== "manager") return NextResponse.json({ error: "Только руководитель может удалять администраторов." }, { status: 403 });
   const params = await context.params;
   const id = Number(params.id);

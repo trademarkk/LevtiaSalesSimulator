@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { getObjectionsByIds, getUserById } from "@/lib/db";
 import { buildConversationPrompt, resolveCurrentObjection } from "@/lib/trainer-engine";
 import { chatRequestSchema, getZodErrorMessage } from "@/lib/validation";
@@ -9,7 +9,7 @@ import { chatRequestSchema, getZodErrorMessage } from "@/lib/validation";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const session = getSessionFromCookie(request.headers.get("cookie")?.match(/levita_session=([^;]+)/)?.[1]);
+  const session = requireApiSession(request, "admin");
 
   if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Доступ разрешен только администраторам." }, { status: 403 });

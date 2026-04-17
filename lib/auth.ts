@@ -93,6 +93,26 @@ export function getSessionFromCookie(rawCookie: string | undefined | null) {
   return decodeSession(rawCookie);
 }
 
+export function getSessionFromRequest(request: Request) {
+  const cookieHeader = request.headers.get("cookie");
+  const rawCookie = cookieHeader?.match(/(?:^|;\s*)levita_session=([^;]+)/)?.[1] ?? null;
+  return decodeSession(rawCookie);
+}
+
+export function requireApiSession(request: Request, role?: UserRole) {
+  const session = getSessionFromRequest(request);
+
+  if (!session) {
+    return null;
+  }
+
+  if (role && session.role !== role) {
+    return null;
+  }
+
+  return session;
+}
+
 export async function requireSession(role?: UserRole) {
   const session = await getCurrentSession();
 

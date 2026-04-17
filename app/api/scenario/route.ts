@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getSessionFromCookie } from "@/lib/auth";
+import { requireApiSession } from "@/lib/auth";
 import { buildScenario } from "@/lib/trainer-engine";
 import { getUserById } from "@/lib/db";
 import { getZodErrorMessage, scenarioRequestSchema } from "@/lib/validation";
@@ -9,7 +9,7 @@ import { ZodError } from "zod";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const session = getSessionFromCookie(request.headers.get("cookie")?.match(/levita_session=([^;]+)/)?.[1]);
+  const session = requireApiSession(request, "admin");
 
   if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Только администратор может запускать тренировку." }, { status: 403 });
