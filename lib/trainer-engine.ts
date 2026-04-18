@@ -86,6 +86,19 @@ function pickRandomItems<T>(items: T[], count: number) {
   return copy.slice(0, Math.max(1, Math.min(count, copy.length)));
 }
 
+function selectScenarioObjections(objectionPool: ObjectionRecord[], stepCount: number) {
+  const normalizedStepCount = Math.max(1, Math.min(stepCount, objectionPool.length));
+  const required = objectionPool.filter((item) => Boolean(item.isRequired));
+
+  if (required.length >= normalizedStepCount) {
+    return pickRandomItems(required, normalizedStepCount);
+  }
+
+  const optional = objectionPool.filter((item) => !item.isRequired);
+  const remaining = normalizedStepCount - required.length;
+  return [...required, ...pickRandomItems(optional, remaining)];
+}
+
 function getTranscript(messages: ChatMessage[]) {
   return messages
     .map((message) => `${message.role === "assistant" ? "Клиентка" : "Администратор"}: ${message.content}`)
@@ -177,7 +190,7 @@ export async function buildScenario(options?: {
     throw new Error("Для выбранной сложности не найдено подходящих возражений.");
   }
 
-  const selectedObjections = pickRandomItems(objectionPool, stepCount);
+  const selectedObjections = selectScenarioObjections(objectionPool, stepCount);
   const selectedPersona = personas[Math.floor(Math.random() * personas.length)];
 
   return {
